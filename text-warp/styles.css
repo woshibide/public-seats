@@ -1,0 +1,151 @@
+body {
+    display: flex;
+    background-color: black;
+    color: rgb(150, 150, 150);
+    min-height: 100svh;
+    align-items: center;
+    margin: 0;
+    font-family: monospace;
+}
+
+.menu-container {
+    position: absolute;
+    max-width: 300px;
+    min-width: 250px;
+    background-color: rgba(26, 26, 26, 0.8);
+    border: 1px solid #666;
+    border-radius: 8px;
+    left: 2rem;
+    top: 2rem;
+    overflow: hidden;
+}
+
+.menu-header {
+    padding-inline: 1rem;
+    background-color: rgba(42, 42, 42, 0.3);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* border-bottom: 1px solid rgb(150, 150, 150); */
+}
+
+.menu-header:hover {
+    background-color: rgba(58, 58, 58, 0.3);
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+    font-size: 1rem;
+}
+
+.dropdown-arrow.expanded {
+    transform: rotate(180deg);
+}
+
+.menu-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: rgba(26, 26, 26, 0.2);
+}
+
+.menu-content.expanded {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.slider-group {
+    padding: 15px;
+    border-bottom: 1px solid #333;
+}
+
+.slider-group:last-child {
+    border-bottom: none;
+}
+
+.slider-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.slider {
+    flex: 1;
+    height: 6px;
+    background-color: #333333a0;
+    border-radius: 3px;
+    outline: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background-color: rgb(150, 150, 150);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #333;
+}
+
+.slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background-color: rgb(150, 150, 150);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #333;
+}
+
+.slider-value {
+    min-width: 40px;
+    text-align: right;
+    font-size: 12px;
+    color: #ccc;
+}
+
+.button-group {
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.control-button {
+    flex: 1;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: rgb(150, 150, 150);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.control-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#p5-canvas {
+    height: 100svh;
+    width: auto;
+    flex: 1;
+}

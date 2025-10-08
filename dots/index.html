@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iba iba iba</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.5/p5.min.js"></script> -->
+</head>
+<body>
+    <div class="menu-container">
+        <div class="menu-header" onclick="toggleMenu()">
+            <h2>Menu</h2>
+            <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="menu-content" id="menuContent">
+            <div class="slider-group">
+                <label class="slider-label">Number of Walkers</label>
+                <div class="slider-container">
+                    <input type="range" min="5" max="100" value="30" class="slider" id="numWalkersSlider" oninput="updateSliderValue('numWalkers', this.value)">
+                    <span class="slider-value" id="numWalkersValue">30</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Grid Rows</label>
+                <div class="slider-container">
+                    <input type="range" min="8" max="32" value="16" class="slider" id="gridRowsSlider" oninput="updateSliderValue('gridRows', this.value)">
+                    <span class="slider-value" id="gridRowsValue">16</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Cycle Length</label>
+                <div class="slider-container">
+                    <input type="range" min="60" max="240" value="120" class="slider" id="cycleLengthSlider" oninput="updateSliderValue('cycleLength', this.value)">
+                    <span class="slider-value" id="cycleLengthValue">120</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Trail Length</label>
+                <div class="slider-container">
+                    <input type="range" min="10" max="100" value="50" class="slider" id="trailLengthSlider" oninput="updateSliderValue('trailLength', this.value)">
+                    <span class="slider-value" id="trailLengthValue">50</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Stroke Weight</label>
+                <div class="slider-container">
+                    <input type="range" min="0.001" max="0.02" step="0.001" value="0.007" class="slider" id="strokeWeightSlider" oninput="updateSliderValue('strokeWeight', this.value)">
+                    <span class="slider-value" id="strokeWeightValue">0.007</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Speed Multiplier</label>
+                <div class="slider-container">
+                    <input type="range" min="0.1" max="2" step="0.1" value="1" class="slider" id="speedMultiplierSlider" oninput="updateSliderValue('speedMultiplier', this.value)">
+                    <span class="slider-value" id="speedMultiplierValue">1</span>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" onclick="refreshSketch()">Refresh Sketch</button>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" onclick="toggleFlag('shadows')">Toggle Shadows</button>
+                <button class="control-button" onclick="toggleFlag('background')">Toggle Background</button>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" id="stopButton" onclick="toggleAnimation()">Stop Animation</button>
+                <button class="control-button" id="exportButton" onclick="exportFrame()">Export Frame</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="p5-canvas"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@ let sliderValues = {
     hueMin: 150,
     hueMax: 160,
     saturation: 80,
-    connectionDistance: 400,
+    connectionDistance: 600,
     ballSpeed: 0.5
 };
 

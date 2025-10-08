@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iba iba iba</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.sound.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/opentype.js@latest/dist/opentype.min.js"></script>
+</head>
+<body>
+    <div class="menu-container">
+        <div class="menu-header" onclick="toggleMenu()">
+            <h2>Menu</h2>
+            <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="menu-content" id="menuContent">
+            
+            <div class="slider-group">
+                <label class="slider-label">Offset</label>
+                <div class="slider-container">
+                    <input type="range" min="-500" max="500" value="0" class="slider" id="offsetSlider" oninput="updateSliderValue('offset', this.value)">
+                    <span class="slider-value" id="offsetValue">0</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Tilt (degrees)</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="90" value="0" class="slider" id="tiltSlider" oninput="updateSliderValue('tilt', this.value)">
+                    <span class="slider-value" id="tiltValue">0</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Speed</label>
+                <div class="slider-container">
+                    <input type="range" min="0.01" max="1" step="0.01" value="0.1" class="slider" id="speedSlider" oninput="updateSliderValue('speed', this.value)">
+                    <span class="slider-value" id="speedValue">0.1</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Text Size</label>
+                <div class="slider-container">
+                    <input type="range" min="0.1" max="1" step="0.01" value="0.25" class="slider" id="textSizeSlider" oninput="updateSliderValue('textSize', this.value)">
+                    <span class="slider-value" id="textSizeValue">0.25</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Display Text</label>
+                <textarea id="textInput" rows="3" oninput="updateText(this.value)">somehow</textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" onclick="refreshSketch()">Refresh Sketch</button>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" id="stopButton" onclick="toggleAnimation()">Stop Animation</button>
+                <button class="control-button" id="exportButton" onclick="exportFrame()">Export Frame</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="p5-canvas"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
