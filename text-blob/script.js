@@ -19,8 +19,8 @@ let flags = {
 };
 
 // appearance variables
-let ellipseSizeMin = 10;
-let ellipseSizeMax = 40;
+let ellipseSizeMin = 15;
+let ellipseSizeMax = 25;
 let strokeHue = 0;
 let strokeSat = 100;
 let strokeBright = 100;
@@ -51,7 +51,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100, 100);
     noStroke();
     
-    points = font.textToPoints("very cool rehab", 200, 400, 200, {sampleFactor: 0.1});
+    points = font.textToPoints("very cool rehab", 200, 400, 200, {sampleFactor: 0.5});
     console.log(points);
     
 
