@@ -6,7 +6,7 @@ let sliderValues = {
     hueMin: 20,
     hueMax: 30,
     saturation: 80,
-    connectionDistance: 50,
+    connectionDistance: 10,
     ballSpeed: 0.3
 };
 
@@ -14,7 +14,7 @@ let sliderValues = {
 let flags = {
     stroke: true,
     balls: false,
-    bg: false
+    bg: true
 };
 
 // animation control
@@ -69,7 +69,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100, 100);
     noStroke();
     
-    let points = font.textToPoints("iba iba iba", 200, 400, 200, {sampleFactor: 0.03});
+    let points = font.textToPoints("image", 200, 400, 200, {sampleFactor: 0.3});
     console.log(points);
     
     // create balls at the text points

@@ -17,50 +17,51 @@
         </div>
         <div class="menu-content" id="menuContent">
             <div class="slider-group">
-                <label class="slider-label">Number of Strips</label>
+                <label class="slider-label">Number of Rows</label>
                 <div class="slider-container">
-                    <input type="range" min="1" max="50" value="1" class="slider" id="numSlider" oninput="updateSliderValue('num', this.value)">
-                    <span class="slider-value" id="numValue">1</span>
+                    <input type="range" min="3" max="10" value="5" class="slider" id="numRowsSlider" oninput="updateSliderValue('numRows', this.value)">
+                    <span class="slider-value" id="numRowsValue">5</span>
                 </div>
             </div>
             
             <div class="slider-group">
-                <label class="slider-label">Offset</label>
+                <label class="slider-label">Number of Columns</label>
                 <div class="slider-container">
-                    <input type="range" min="-500" max="500" value="0" class="slider" id="offsetSlider" oninput="updateSliderValue('offset', this.value)">
-                    <span class="slider-value" id="offsetValue">0</span>
+                    <input type="range" min="3" max="10" value="5" class="slider" id="numColsSlider" oninput="updateSliderValue('numCols', this.value)">
+                    <span class="slider-value" id="numColsValue">5</span>
                 </div>
             </div>
             
             <div class="slider-group">
-                <label class="slider-label">Tilt (degrees)</label>
+                <label class="slider-label">Row Width</label>
                 <div class="slider-container">
-                    <input type="range" min="0" max="90" value="0" class="slider" id="tiltSlider" oninput="updateSliderValue('tilt', this.value)">
-                    <span class="slider-value" id="tiltValue">0</span>
+                    <input type="range" min="20" max="100" value="40" class="slider" id="rowWidthSlider" oninput="updateSliderValue('rowWidth', this.value)">
+                    <span class="slider-value" id="rowWidthValue">40</span>
                 </div>
             </div>
             
             <div class="slider-group">
-                <label class="slider-label">Speed</label>
+                <label class="slider-label">Column Width</label>
                 <div class="slider-container">
-                    <input type="range" min="0.01" max="1" step="0.01" value="0.1" class="slider" id="speedSlider" oninput="updateSliderValue('speed', this.value)">
-                    <span class="slider-value" id="speedValue">0.1</span>
+                    <input type="range" min="20" max="100" value="40" class="slider" id="colWidthSlider" oninput="updateSliderValue('colWidth', this.value)">
+                    <span class="slider-value" id="colWidthValue">40</span>
                 </div>
             </div>
             
             <div class="slider-group">
-                <label class="slider-label">Text Size</label>
+                <label class="slider-label">Random Offset</label>
                 <div class="slider-container">
-                    <input type="range" min="0.1" max="1" step="0.01" value="0.25" class="slider" id="textSizeSlider" oninput="updateSliderValue('textSize', this.value)">
-                    <span class="slider-value" id="textSizeValue">0.25</span>
+                    <input type="range" min="0" max="20" value="3" class="slider" id="randomOffsetSlider" oninput="updateSliderValue('randomOffset', this.value)">
+                    <span class="slider-value" id="randomOffsetValue">3</span>
                 </div>
             </div>
             
             <div class="slider-group">
-                <label class="slider-label">Display Text</label>
-                <textarea id="textInput" rows="3" oninput="updateText(this.value)">hello
-from
-somehow</textarea>
+                <label class="slider-label">Interpolation Steps</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="20" value="8" class="slider" id="interpolationStepsSlider" oninput="updateSliderValue('interpolationSteps', this.value)">
+                    <span class="slider-value" id="interpolationStepsValue">8</span>
+                </div>
             </div>
             
             <div class="button-group">
@@ -81,6 +82,7 @@ somehow</textarea>
     
     <div id="p5-canvas"></div>
 
+    <script src="boid.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
