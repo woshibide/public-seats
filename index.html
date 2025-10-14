@@ -7,7 +7,7 @@
     <title>iba iba iba</title>
     <style>
         body{
-            font-family: Georgia, monospace, Times, serif;
+            font-family: Georgia, 'Times New Roman', Times, serif;
             background-color: black;
             color: aliceblue;
         }
@@ -45,9 +45,8 @@
         }
     </style>
 </head>
-<body>
-    <div style="padding: 3rem;">
-
+<body style="padding: 3rem;">
+    <div>
         <h1>
             IBA
         </h1>
@@ -56,13 +55,16 @@
             experiments below
         </p>
     </div>
-
-    <ul>
-        <li class="link-item"><a href="bezier/index.html">bezier</a></li>
+    <div style="padding: 3rem;">
+        <div style="padding: 1rem;">
+            <h2>layers</h2>
+            <ul>
+                <li class="link-item"><a href="bezier/index.html">bezier</a></li>
 <li class="link-item"><a href="dots/index.html">dots</a></li>
 <li class="link-item"><a href="flock/index.html">flock</a></li>
 <li class="link-item"><a href="grids/index.html">grids</a></li>
 <li class="link-item"><a href="lines/index.html">lines</a></li>
+<li class="link-item"><a href="lines-glitch/index.html">lines-glitch</a></li>
 <li class="link-item"><a href="seats/index.html">seats</a></li>
 <li class="link-item"><a href="text-blob/index.html">text-blob</a></li>
 <li class="link-item"><a href="text-slice/index.html">text-slice</a></li>
@@ -71,7 +73,15 @@
 <li class="link-item"><a href="text-warp/index.html">text-warp</a></li>
 <li class="link-item"><a href="the-grid/index.html">the-grid</a></li>
 <li class="link-item"><a href="whopwhopwhop/index.html">whopwhopwhop</a></li>
-    </ul>
+            </ul>
+        </div>
+        <div style="padding: 1rem;">
+            <h2>its a match</h2>
+            <ul>
+                {{links}}
+            </ul>
+        </div>
+    </div>
 
     
 </body>
