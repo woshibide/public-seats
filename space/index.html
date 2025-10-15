@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iba iba iba</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.5/p5.min.js"></script> -->
+</head>
+<body>
+    <div class="menu-container">
+        <div class="menu-header" onclick="toggleMenu()">
+            <h2>Menu</h2>
+            <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="menu-content" id="menuContent">
+            <div class="slider-group">
+                <label class="slider-label">Max Stars</label>
+                <div class="slider-container">
+                    <input type="range" min="1000" max="50000" step="1000" value="20000" class="slider" id="maxStarsSlider" oninput="updateSliderValue('maxStars', this.value); updateMaxStars(this.value)">
+                    <span class="slider-value" id="maxStarsValue">20000</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">New Stars per Frame</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="200" step="1" value="50" class="slider" id="newStarsSlider" oninput="updateSliderValue('newStars', this.value); updateNewStarsPerFrame(this.value)">
+                    <span class="slider-value" id="newStarsValue">50</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Speed Min</label>
+                <div class="slider-container">
+                    <input type="range" min="0.1" max="2" step="0.1" value="0.2" class="slider" id="speedMinSlider" oninput="updateSliderValue('speedMin', this.value); updateSpeedMin(this.value)">
+                    <span class="slider-value" id="speedMinValue">0.2</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Speed Max</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="10" step="0.1" value="5" class="slider" id="speedMaxSlider" oninput="updateSliderValue('speedMax', this.value); updateSpeedMax(this.value)">
+                    <span class="slider-value" id="speedMaxValue">5</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Size Incr Max</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="0.1" step="0.001" value="0.03" class="slider" id="sizeIncrMaxSlider" oninput="updateSliderValue('sizeIncrMax', this.value); updateSizeIncrMax(this.value)">
+                    <span class="slider-value" id="sizeIncrMaxValue">0.03</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Age Threshold</label>
+                <div class="slider-container">
+                    <input type="range" min="50" max="500" step="10" value="200" class="slider" id="ageThresholdSlider" oninput="updateSliderValue('ageThreshold', this.value); updateAgeThreshold(this.value)">
+                    <span class="slider-value" id="ageThresholdValue">200</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Noise Scale</label>
+                <div class="slider-container">
+                    <input type="range" min="0.0001" max="0.01" step="0.0001" value="0.001" class="slider" id="noiseScaleSlider" oninput="updateSliderValue('noiseScale', this.value); updateNoiseScale(this.value)">
+                    <span class="slider-value" id="noiseScaleValue">0.001</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Movement Sensitivity</label>
+                <div class="slider-container">
+                    <input type="range" min="0.01" max="0.2" step="0.01" value="0.05" class="slider" id="movementSensitivitySlider" oninput="updateSliderValue('movementSensitivity', this.value); updateMovementSensitivity(this.value)">
+                    <span class="slider-value" id="movementSensitivityValue">0.05</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">X Position</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="1920" step="1" value="960" class="slider" id="xSlider" oninput="updateSliderValue('x', this.value); updateX(this.value)">
+                    <span class="slider-value" id="xValue">960</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Y Position</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="1080" step="1" value="540" class="slider" id="ySlider" oninput="updateSliderValue('y', this.value); updateY(this.value)">
+                    <span class="slider-value" id="yValue">540</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Background Fade Max</label>
+                <div class="slider-container">
+                    <input type="range" min="-50" max="500" step="1" value="255" class="slider" id="fadeMaxSlider" oninput="updateSliderValue('fadeMax', this.value); updateFadeMax(this.value)">
+                    <span class="slider-value" id="fadeMaxValue">255</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Background Fade Min</label>
+                <div class="slider-container">
+                    <input type="range" min="-50" max="500" step="1" value="-10" class="slider" id="fadeMinSlider" oninput="updateSliderValue('fadeMin', this.value); updateFadeMin(this.value)">
+                    <span class="slider-value" id="fadeMinValue">-10</span>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" onclick="togglePause()">Pause/Resume</button>
+                <button class="control-button" onclick="remakeAnimation()">Remake Animation</button>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" id="exportButton" onclick="exportFrame()">Export Frame</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="p5-canvas"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

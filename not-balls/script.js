@@ -244,32 +244,8 @@ function exportFrame() {
     saveCanvas('animation_frame', 'png');
 }
 
-// drag functions
-let isDragging = false;
-let dragOffsetX, dragOffsetY;
 
-function startDrag(e) {
-    isDragging = true;
-    const menu = document.querySelector('.menu-container');
-    const rect = menu.getBoundingClientRect();
-    dragOffsetX = e.clientX - rect.left;
-    dragOffsetY = e.clientY - rect.top;
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDrag);
-}
 
-function drag(e) {
-    if (!isDragging) return;
-    const menu = document.querySelector('.menu-container');
-    menu.style.left = (e.clientX - dragOffsetX) + 'px';
-    menu.style.top = (e.clientY - dragOffsetY) + 'px';
-}
-
-function stopDrag() {
-    isDragging = false;
-    document.removeEventListener('mousemove', drag);
-    document.removeEventListener('mouseup', stopDrag);
-}
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
