@@ -13,6 +13,7 @@ body {
 }
 
 .menu-container {
+    z-index: 100;
     position: absolute;
     max-width: 18.75rem;
     min-width: 15.625rem;
@@ -168,8 +169,65 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+.control-select {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 0.0625rem solid #666;
+    border-radius: 0.25rem;
+    color: rgb(150, 150, 150);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-family: monospace;
+}
+
+.control-select:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.control-select option {
+    background-color: #1a1a1a;
+    color: rgb(150, 150, 150);
+}
+
+.text-input {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 0.0625rem solid #666;
+    border-radius: 0.25rem;
+    color: rgb(150, 150, 150);
+    font-size: 0.875rem;
+    font-family: monospace;
+    box-sizing: border-box;
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: rgb(150, 150, 150);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
 #p5-canvas {
     height: 100svh;
     width: auto;
     flex: 1;
+}
+
+#frosted-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(40px);
+    background-color: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+#frosted-overlay.active {
+    opacity: 1;
 }

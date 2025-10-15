@@ -126,6 +126,21 @@
                     </div>
                 </div>
             </div>
+            <div class="slider-section">
+                <h3>Obstacle</h3>
+                <div class="slider-group">
+                    <label class="slider-label">Obstacle Type</label>
+                    <select class="control-select" id="obstacleType" onchange="changeObstacleType(this.value)">
+                        <option value="circle">Circle</option>
+                        <option value="text">Text</option>
+                        <option value="rectangle">Rectangle</option>
+                    </select>
+                </div>
+                <div class="slider-group" id="textInputGroup">
+                    <label class="slider-label">Text Content</label>
+                    <input type="text" class="text-input" id="textInput" value="i b a" oninput="updateText(this.value)">
+                </div>
+            </div>
             <div class="button-group">
                 <button class="control-button" onclick="refreshSketch()">Refresh Sketch</button>
             </div>

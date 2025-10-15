@@ -1,20 +1,6 @@
-// hey u!
-//          )      (\_
-//         ((    _/{  "-;
-//          )).-' {{ ;'`
-//         ( (  ;._ \\     
-// @od3zza is here.
-
-// Array que armazenará todas as partículas
 let particles1 = [];
 
-// Número total de partículas
 let num = 500;
-
-// Variáveis para o microfone
-// let mic;
-// let vol;
-// let smoothedVol = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -24,7 +10,7 @@ function setup() {
         let p = createVector(random(width), random(height));
         p.prevX = p.x;
         p.prevY = p.y;
-        p.life = 18;
+        p.life = 1000;
         p.hue = random(360);
         particles1.push(p);
     }
@@ -38,19 +24,13 @@ function setup() {
 function draw() {
     blendMode(BLEND);
 
-    // vol = mic.getLevel();
-    // smoothedVol = lerp(smoothedVol, vol, 0.2);
+    let minStrength = 1; 
+    let maxStrength = 100;
+    let strength = 5; // Fixed strength for constant movement
 
-    // --- MUDANÇA: Aumenta a força mínima e máxima para movimento constante e intenso
-    let minStrength = 10; // Aumentado para 10, garantindo movimento constante
-    let maxStrength = 80;  // Aumentado para 80, para um impacto visual mais forte
-
-    // let mappedVol = pow(smoothedVol, 2);
-    // let strength = map(mappedVol, 0, pow(0.15, 2), minStrength, maxStrength);
-    let strength = 1; // Fixed strength for constant movement
     strength = constrain(strength, minStrength, maxStrength);
 
-    let zoom = 3000;
+    let zoom = 500;
     background(0, 40);
     strokeWeight(1);
 
@@ -61,8 +41,8 @@ function draw() {
         p.prevX = p.x;
         p.prevY = p.y;
 
-        p.x += cos(angle) * strength * 3;
-        p.y += sin(angle) * strength * 3;
+        p.x += cos(angle) * strength;
+        p.y += sin(angle) * strength;
 
         if (p.x < 0) p.x = width;
         if (p.x > width) p.y = 0;
@@ -76,7 +56,7 @@ function draw() {
             p.y = random(height);
             p.prevX = p.x;
             p.prevY = p.y;
-            p.life = 5;
+            p.life = 1000;
         }
 
         // --- MUDANÇA: Mapeia a transparência (alpha) diretamente do volume
