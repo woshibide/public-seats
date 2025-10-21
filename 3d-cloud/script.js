@@ -13,7 +13,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 // global config object for feature toggles
 const config = {
   enableCore: true,
-  enablePostprocessing: true,
+  enablePostprocessing: false,
   enableHalftone: true,
   enableGeometry: true,
   enableAnimation: true,
@@ -242,6 +242,18 @@ class PostProcessor {
     this.renderScene = null;
     this.mixPass = null;
     this.outputPass = null;
+    this.halftoneParams = {
+      shape: 1, // round dots
+      radius: 4,
+      rotateR: Math.PI / 12,
+      rotateB: Math.PI / 12 * 2,
+      rotateG: Math.PI / 12 * 3,
+      scatter: 0,
+      blending: 1,
+      blendingMode: 1,
+      greyscale: false,
+      disable: false
+    };
   }
 
   enableBloom() {
@@ -308,19 +320,7 @@ class PostProcessor {
 
     // setup halftone pass if halftone is enabled
     if (this.halftoneEnabled) {
-      const halftoneParams = {
-        shape: 1, // round dots
-        radius: 4,
-        rotateR: Math.PI / 12,
-        rotateB: Math.PI / 12 * 2,
-        rotateG: Math.PI / 12 * 3,
-        scatter: 0,
-        blending: 1,
-        blendingMode: 1,
-        greyscale: false,
-        disable: false
-      };
-      this.halftonePass = new HalftonePass(window.innerWidth, window.innerHeight, halftoneParams);
+      this.halftonePass = new HalftonePass(window.innerWidth, window.innerHeight, this.halftoneParams);
     } else {
       this.halftonePass = null;
     }
@@ -427,6 +427,19 @@ function init() {
 
   // window resize (additional handling for composers)
   window.addEventListener('resize', onWindowResize);
+
+  // image upload handler
+  const imageUpload = document.getElementById('imageUpload');
+  imageUpload.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        loadImageCloud(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   // enable postprocessing
   if (config.enablePostprocessing) postProcessor.enableBloom();
@@ -608,6 +621,62 @@ function setupGUI() {
   });
   bloomFolder.add(bloomParams, 'exposure', 0.1, 2).onChange(value => {
     renderer.toneMappingExposure = Math.pow(value, 4.0);
+    render();
+  });
+
+  const halftoneFolder = gui.addFolder('Halftone');
+  halftoneFolder.add(postProcessor.halftoneParams, 'shape', 0, 10).step(1).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.shape.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'radius', 0, 50).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.radius.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'rotateR', 0, 2 * Math.PI).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.rotateR.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'rotateB', 0, 2 * Math.PI).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.rotateB.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'rotateG', 0, 2 * Math.PI).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.rotateG.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'scatter', 0, 1).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.scatter.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'blending', 0, 1).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.blending.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'blendingMode', 0, 10).step(1).onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.blendingMode.value = value;
+    }
+    render();
+  });
+  halftoneFolder.add(postProcessor.halftoneParams, 'greyscale').onChange(value => {
+    if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+      postProcessor.halftonePass.uniforms.greyscale.value = value;
+    }
     render();
   });
 
