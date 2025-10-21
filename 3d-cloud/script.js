@@ -6,15 +6,19 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { HalftonePass } from 'three/addons/postprocessing/HalftonePass.js';
 import Stats from 'three/addons/libs/stats.module.js';
+
 
 // global config object for feature toggles
 const config = {
   enableCore: true,
   enablePostprocessing: false,
   enableHalftone: true,
+  enableFilm: true,
+  enableColor: true,
   enableGeometry: true,
   enableAnimation: true,
   enableInteraction: true,
@@ -197,7 +201,7 @@ class CoreInit {
   }
 
   initRenderer() {
-    this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas"), antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas"), antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.toneMapping = THREE.ReinhardToneMapping;
@@ -236,9 +240,13 @@ class PostProcessor {
   constructor() {
     this.bloomEnabled = false;
     this.halftoneEnabled = false;
+    this.filmEnabled = false;
+    this.colorEnabled = false;
     this.bloomComposer = null;
     this.finalComposer = null;
     this.halftonePass = null;
+    this.filmPass = null;
+    this.colorPass = null;
     this.renderScene = null;
     this.mixPass = null;
     this.outputPass = null;
@@ -253,6 +261,35 @@ class PostProcessor {
       blendingMode: 1,
       greyscale: false,
       disable: false
+    };
+    this.filmParams = {
+      noiseIntensity: 0.5,
+      scanlinesIntensity: 0.05,
+      scanlinesCount: 4096,
+      grayscale: false
+    };
+    this.colorParams = {
+      color: new THREE.Color(0x88CCFF)
+    };
+    this.colorShader = {
+      uniforms: {
+        tDiffuse: { value: null },
+        color: { value: new THREE.Color(0x88CCFF) },
+      },
+      vertexShader: `varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
+}`,
+      fragmentShader: `varying vec2 vUv;
+uniform sampler2D tDiffuse;
+uniform vec3 color;
+void main() {
+  vec4 previousPassColor = texture2D(tDiffuse, vUv);
+  gl_FragColor = vec4(
+    previousPassColor.rgb * color,
+    previousPassColor.a);
+}`,
     };
   }
 
@@ -275,6 +312,28 @@ class PostProcessor {
 
   disableHalftone() {
     this.halftoneEnabled = false;
+    this.setupPostprocessing();
+  }
+
+  enableFilm() {
+    if (!config.enableFilm) return;
+    this.filmEnabled = true;
+    this.setupPostprocessing();
+  }
+
+  disableFilm() {
+    this.filmEnabled = false;
+    this.setupPostprocessing();
+  }
+
+  enableColor() {
+    if (!config.enableColor) return;
+    this.colorEnabled = true;
+    this.setupPostprocessing();
+  }
+
+  disableColor() {
+    this.colorEnabled = false;
     this.setupPostprocessing();
   }
 
@@ -325,6 +384,34 @@ class PostProcessor {
       this.halftonePass = null;
     }
 
+    // setup film pass if film is enabled
+    if (this.filmEnabled) {
+      this.filmPass = new FilmPass(this.filmParams.noiseIntensity, this.filmParams.scanlinesIntensity, this.filmParams.scanlinesCount, this.filmParams.grayscale);
+      if (this.filmPass && this.filmPass.uniforms) {
+        if (! ('nIntensity' in this.filmPass.uniforms)) {
+          this.filmPass.uniforms.nIntensity = { value: this.filmParams.noiseIntensity };
+        }
+        if (! ('sIntensity' in this.filmPass.uniforms)) {
+          this.filmPass.uniforms.sIntensity = { value: this.filmParams.scanlinesIntensity };
+        }
+        if (! ('sCount' in this.filmPass.uniforms)) {
+          this.filmPass.uniforms.sCount = { value: this.filmParams.scanlinesCount };
+        }
+        if (! ('grayscale' in this.filmPass.uniforms)) {
+          this.filmPass.uniforms.grayscale = { value: this.filmParams.grayscale ? 1 : 0 };
+        }
+      }
+    } else {
+      this.filmPass = null;
+    }
+
+    // setup color pass if color is enabled
+    if (this.colorEnabled) {
+      this.colorPass = new ShaderPass(this.colorShader);
+    } else {
+      this.colorPass = null;
+    }
+
     // setup final composer with appropriate passes
     this.finalComposer = new EffectComposer(renderer);
     this.finalComposer.addPass(this.renderScene);
@@ -337,6 +424,14 @@ class PostProcessor {
       this.finalComposer.addPass(this.halftonePass);
     }
     
+    if (this.filmEnabled && this.filmPass) {
+      this.finalComposer.addPass(this.filmPass);
+    }
+    
+    if (this.colorEnabled && this.colorPass) {
+      this.finalComposer.addPass(this.colorPass);
+    }
+    
     this.finalComposer.addPass(this.outputPass);
   }
 
@@ -347,7 +442,7 @@ class PostProcessor {
   }
 
   render() {
-    if (!this.bloomEnabled && !this.halftoneEnabled) {
+    if (!this.bloomEnabled && !this.halftoneEnabled && !this.filmEnabled && !this.colorEnabled) {
       renderer.render(scene, camera);
       return;
     }
@@ -373,6 +468,11 @@ let halftonePass;
 // material storage for bloom rendering
 const darkMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
 const materials = {};
+
+// global image data for dynamic rebuilding
+let globalImgData = null;
+let globalW = 0;
+let globalH = 0;
 
 // image parameters
 let depthMultiplier = 100;
@@ -444,6 +544,8 @@ function init() {
   // enable postprocessing
   if (config.enablePostprocessing) postProcessor.enableBloom();
   if (config.enableHalftone) postProcessor.enableHalftone();
+  if (config.enableFilm) postProcessor.enableFilm();
+  if (config.enableColor) postProcessor.enableColor();
 
   // Add systems to ECS
   ecs.addSystem(coreSystem);
@@ -479,47 +581,21 @@ function loadImageCloud(src) {
     ctx.drawImage(img, 0, 0, w, h);
     const imgData = ctx.getImageData(0, 0, w, h).data;
 
-    // Clear existing entities
-    for (const entity of [...ecs.entities]) {
-      const mesh = ecs.getComponent(entity, MESH);
-      if (mesh) {
-        mesh.geometry.dispose();
-        mesh.material.dispose();
-        pointCloudGroup.remove(mesh);
-      }
-      ecs.destroyEntity(entity);
-    }
-    pointMeshes = [];
+    // Store global data for dynamic rebuilding
+    globalImgData = imgData;
+    globalW = w;
+    globalH = h;
 
-    for (let y = 0; y < h; y += resolution) {
-      for (let x = 0; x < w; x += resolution) {
-        const i = (y * w + x) * 4;
-        const r = imgData[i] / 255;
-        const g = imgData[i + 1] / 255;
-        const b = imgData[i + 2] / 255;
-        const brightness = (r + g + b) / 3;
-        if (brightness <= dropoffBlack || brightness >= 1 - dropoffWhite) continue;
-
-        const entity = ecs.createEntity();
-        ecs.addComponent(entity, POSITION, {
-          x: (x - w/2) * objectScale,
-          y: (h/2 - y) * objectScale,
-          z: (brightness - 0.5) * depthMultiplier
-        });
-        ecs.addComponent(entity, COLOR, { r, g, b });
-        if (Math.random() < 0.1) {
-          ecs.addComponent(entity, BLOOM_ENABLED, true);
-        }
-      }
-    }
     rebuildGeometry();
     camera.position.z = Math.max(w, h) * 5;
   };
 }
 
 function rebuildGeometry() {
-  // Dispose existing meshes
-  for (const entity of ecs.entities) {
+  if (!globalImgData) return;
+
+  // Dispose existing meshes and destroy entities
+  for (const entity of [...ecs.entities]) {
     const mesh = ecs.getComponent(entity, MESH);
     if (mesh) {
       mesh.geometry.dispose();
@@ -527,8 +603,32 @@ function rebuildGeometry() {
       pointCloudGroup.remove(mesh);
       ecs.removeComponent(entity, MESH);
     }
+    ecs.destroyEntity(entity);
   }
   pointMeshes = [];
+
+  // Recreate entities based on current parameters
+  for (let y = 0; y < globalH; y += resolution) {
+    for (let x = 0; x < globalW; x += resolution) {
+      const i = (y * globalW + x) * 4;
+      const r = globalImgData[i] / 255;
+      const g = globalImgData[i + 1] / 255;
+      const b = globalImgData[i + 2] / 255;
+      const brightness = (r + g + b) / 3;
+      if (brightness <= dropoffBlack || brightness >= 1 - dropoffWhite) continue;
+
+      const entity = ecs.createEntity();
+      ecs.addComponent(entity, POSITION, {
+        x: x - globalW/2,
+        y: globalH/2 - y,
+        z: brightness - 0.5
+      });
+      ecs.addComponent(entity, COLOR, { r, g, b });
+      if (Math.random() < 0.1) {
+        ecs.addComponent(entity, BLOOM_ENABLED, true);
+      }
+    }
+  }
 
   const geometry = new THREE.SphereGeometry(pointSize * 0.5, 8, 8);
 
@@ -541,7 +641,7 @@ function rebuildGeometry() {
       color: new THREE.Color(col.r, col.g, col.b) 
     });
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(pos.x, pos.y, pos.z);
+    mesh.position.set(pos.x * objectScale, pos.y * objectScale, pos.z * depthMultiplier);
 
     if (ecs.hasComponent(entity, BLOOM_ENABLED)) {
       mesh.layers.enable(BLOOM_SCENE);
@@ -586,6 +686,14 @@ function setupGUI() {
     if (value) postProcessor.enableHalftone(); else postProcessor.disableHalftone();
     render();
   });
+  togglesFolder.add(config, 'enableFilm').name('Film Effect').onChange(value => {
+    if (value) postProcessor.enableFilm(); else postProcessor.disableFilm();
+    render();
+  });
+  togglesFolder.add(config, 'enableColor').name('Color Effect').onChange(value => {
+    if (value) postProcessor.enableColor(); else postProcessor.disableColor();
+    render();
+  });
   togglesFolder.add(config, 'enableGeometry').name('Geometry (Point Cloud)').onChange(value => {
     console.log('Geometry toggle:', value);
   });
@@ -625,7 +733,7 @@ function setupGUI() {
   });
 
   const halftoneFolder = gui.addFolder('Halftone');
-  halftoneFolder.add(postProcessor.halftoneParams, 'shape', 0, 10).step(1).onChange(value => {
+  halftoneFolder.add(postProcessor.halftoneParams, 'shape', 0, 4).step(1).onChange(value => {
     if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
       postProcessor.halftonePass.uniforms.shape.value = value;
     }
@@ -680,6 +788,52 @@ function setupGUI() {
     render();
   });
 
+  const filmFolder = gui.addFolder('Film');
+  filmFolder.add(postProcessor.filmParams, 'noiseIntensity', 0, 5).onChange(value => {
+    if (postProcessor.filmPass && postProcessor.filmPass.uniforms && postProcessor.filmPass.uniforms.nIntensity) {
+      postProcessor.filmPass.uniforms.nIntensity.value = value;
+    }
+    render();
+  });
+  filmFolder.add(postProcessor.filmParams, 'scanlinesIntensity', 0, 2).onChange(value => {
+    if (postProcessor.filmPass && postProcessor.filmPass.uniforms && postProcessor.filmPass.uniforms.sIntensity) {
+      postProcessor.filmPass.uniforms.sIntensity.value = value;
+    }
+    render();
+  });
+  filmFolder.add(postProcessor.filmParams, 'scanlinesCount', 0, 10000).onChange(value => {
+    if (postProcessor.filmPass && postProcessor.filmPass.uniforms && postProcessor.filmPass.uniforms.sCount) {
+      postProcessor.filmPass.uniforms.sCount.value = value;
+    }
+    render();
+  });
+  filmFolder.add(postProcessor.filmParams, 'grayscale').onChange(value => {
+    if (postProcessor.filmPass && postProcessor.filmPass.uniforms && postProcessor.filmPass.uniforms.grayscale) {
+      postProcessor.filmPass.uniforms.grayscale.value = value ? 1 : 0;
+    }
+    render();
+  });
+
+  const colorFolder = gui.addFolder('Color');
+  colorFolder.add(postProcessor.colorParams.color, 'r', 0, 4).onChange(value => {
+    if (postProcessor.colorPass && postProcessor.colorPass.uniforms) {
+      postProcessor.colorPass.uniforms.color.value.r = value;
+    }
+    render();
+  });
+  colorFolder.add(postProcessor.colorParams.color, 'g', 0, 4).onChange(value => {
+    if (postProcessor.colorPass && postProcessor.colorPass.uniforms) {
+      postProcessor.colorPass.uniforms.color.value.g = value;
+    }
+    render();
+  });
+  colorFolder.add(postProcessor.colorParams.color, 'b', 0, 4).onChange(value => {
+    if (postProcessor.colorPass && postProcessor.colorPass.uniforms) {
+      postProcessor.colorPass.uniforms.color.value.b = value;
+    }
+    render();
+  });
+
   const imageFolder = gui.addFolder('Image');
   imageFolder.add({ depthMultiplier }, 'depthMultiplier', 1, 1000).onChange(value => {
     depthMultiplier = value;
@@ -730,4 +884,122 @@ function animate() {
 init();
 loadImageCloud();
 setupGUI();
+
+// Button event listeners
+let guiVisible = true;
+document.getElementById('toggleGui').addEventListener('click', () => {
+  if (guiVisible) {
+    gui.hide();
+    coreInit.stats.dom.style.display = 'none';
+  } else {
+    gui.show();
+    coreInit.stats.dom.style.display = 'block';
+  }
+  guiVisible = !guiVisible;
+});
+
+document.getElementById('exportPng').addEventListener('click', () => {
+  render();
+  const link = document.createElement('a');
+  link.download = 'canvas.png';
+  link.href = renderer.domElement.toDataURL('image/png');
+  link.click();
+});
+
+document.getElementById('randomize').addEventListener('click', () => {
+  // Helper function to add noise to a value within bounds
+  const addNoise = (value, min, max, noiseFactor = 0.1) => {
+    const range = max - min;
+    const noise = (Math.random() - 0.5) * 2 * range * noiseFactor;
+    return Math.max(min, Math.min(max, value + noise));
+  };
+
+  // Randomize bloom parameters
+  bloomParams.threshold = addNoise(bloomParams.threshold, 0, 1);
+  bloomParams.strength = addNoise(bloomParams.strength, 0, 3);
+  bloomParams.radius = addNoise(bloomParams.radius, 0, 1);
+  bloomParams.exposure = addNoise(bloomParams.exposure, 0.1, 2);
+
+  // Apply bloom changes
+  if (postProcessor.bloomComposer && postProcessor.bloomComposer.passes[1]) {
+    postProcessor.bloomComposer.passes[1].threshold = bloomParams.threshold;
+    postProcessor.bloomComposer.passes[1].strength = bloomParams.strength;
+    postProcessor.bloomComposer.passes[1].radius = bloomParams.radius;
+  }
+  renderer.toneMappingExposure = Math.pow(bloomParams.exposure, 4.0);
+
+  // Randomize halftone parameters
+  postProcessor.halftoneParams.shape = Math.floor(addNoise(postProcessor.halftoneParams.shape, 0, 4));
+  postProcessor.halftoneParams.radius = addNoise(postProcessor.halftoneParams.radius, 0, 50);
+  postProcessor.halftoneParams.rotateR = addNoise(postProcessor.halftoneParams.rotateR, 0, 2 * Math.PI);
+  postProcessor.halftoneParams.rotateG = addNoise(postProcessor.halftoneParams.rotateG, 0, 2 * Math.PI);
+  postProcessor.halftoneParams.rotateB = addNoise(postProcessor.halftoneParams.rotateB, 0, 2 * Math.PI);
+  postProcessor.halftoneParams.scatter = addNoise(postProcessor.halftoneParams.scatter, 0, 1);
+  postProcessor.halftoneParams.blending = addNoise(postProcessor.halftoneParams.blending, 0, 1);
+  postProcessor.halftoneParams.blendingMode = Math.floor(addNoise(postProcessor.halftoneParams.blendingMode, 0, 10));
+
+  // Apply halftone changes
+  if (postProcessor.halftonePass && postProcessor.halftonePass.uniforms) {
+    postProcessor.halftonePass.uniforms.shape.value = postProcessor.halftoneParams.shape;
+    postProcessor.halftonePass.uniforms.radius.value = postProcessor.halftoneParams.radius;
+    postProcessor.halftonePass.uniforms.rotateR.value = postProcessor.halftoneParams.rotateR;
+    postProcessor.halftonePass.uniforms.rotateG.value = postProcessor.halftoneParams.rotateG;
+    postProcessor.halftonePass.uniforms.rotateB.value = postProcessor.halftoneParams.rotateB;
+    postProcessor.halftonePass.uniforms.scatter.value = postProcessor.halftoneParams.scatter;
+    postProcessor.halftonePass.uniforms.blending.value = postProcessor.halftoneParams.blending;
+    postProcessor.halftonePass.uniforms.blendingMode.value = postProcessor.halftoneParams.blendingMode;
+    postProcessor.halftonePass.uniforms.greyscale.value = postProcessor.halftoneParams.greyscale;
+  }
+
+  // Randomize film parameters
+  postProcessor.filmParams.noiseIntensity = addNoise(postProcessor.filmParams.noiseIntensity, 0, 5);
+  postProcessor.filmParams.scanlinesIntensity = addNoise(postProcessor.filmParams.scanlinesIntensity, 0, 2);
+  postProcessor.filmParams.scanlinesCount = addNoise(postProcessor.filmParams.scanlinesCount, 0, 10000);
+
+  // Apply film changes
+  if (postProcessor.filmPass && postProcessor.filmPass.uniforms) {
+    if (postProcessor.filmPass.uniforms.nIntensity) postProcessor.filmPass.uniforms.nIntensity.value = postProcessor.filmParams.noiseIntensity;
+    if (postProcessor.filmPass.uniforms.sIntensity) postProcessor.filmPass.uniforms.sIntensity.value = postProcessor.filmParams.scanlinesIntensity;
+    if (postProcessor.filmPass.uniforms.sCount) postProcessor.filmPass.uniforms.sCount.value = postProcessor.filmParams.scanlinesCount;
+    if (postProcessor.filmPass.uniforms.grayscale) postProcessor.filmPass.uniforms.grayscale.value = postProcessor.filmParams.grayscale ? 1 : 0;
+  }
+
+  // Randomize color parameters
+  postProcessor.colorParams.color.r = addNoise(postProcessor.colorParams.color.r, 0, 4);
+  postProcessor.colorParams.color.g = addNoise(postProcessor.colorParams.color.g, 0, 4);
+  postProcessor.colorParams.color.b = addNoise(postProcessor.colorParams.color.b, 0, 4);
+
+  // Apply color changes
+  if (postProcessor.colorPass && postProcessor.colorPass.uniforms) {
+    postProcessor.colorPass.uniforms.color.value.r = postProcessor.colorParams.color.r;
+    postProcessor.colorPass.uniforms.color.value.g = postProcessor.colorParams.color.g;
+    postProcessor.colorPass.uniforms.color.value.b = postProcessor.colorParams.color.b;
+  }
+
+  // Randomize image parameters
+  depthMultiplier = addNoise(depthMultiplier, 1, 1000);
+  pointSize = addNoise(pointSize, 1, 10);
+  dropoffBlack = addNoise(dropoffBlack, 0, 0.5);
+  dropoffWhite = addNoise(dropoffWhite, 0, 0.5);
+  resolution = Math.floor(addNoise(resolution, 1, 10));
+  objectScale = addNoise(objectScale, 1, 40);
+
+  // Randomize animation parameters
+  rotationSpeed = addNoise(rotationSpeed, 0, 0.05);
+  rotationDirection = addNoise(rotationDirection, -1, 1);
+  verticalRotation = addNoise(verticalRotation, -0.02, 0.02);
+
+  // Update GUI controllers to reflect new values
+  if (gui && gui.updateDisplay) {
+    gui.updateDisplay();
+  }
+
+  // Rebuild geometry for image parameter changes
+  rebuildGeometry();
+
+  // Re-render to apply changes
+  render();
+});
+
 animate();
+

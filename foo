@@ -1,0 +1,40 @@
+    const colorShader = {
+      uniforms: {
+        tDiffuse: { value: null },
+        color:    { value: new THREE.Color(0x88CCFF) },
+      },
+      vertexShader: 
+    varying vec2 vUv;
+    void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
+    }
+    ,
+      fragmentShader: 
+    varying vec2 vUv;
+    uniform sampler2D tDiffuse;
+    uniform vec3 color;
+    void main() {
+    vec4 previousPassColor = texture2D(tDiffuse, vUv);
+    gl_FragColor = vec4(
+    previousPassColor.rgb * color,
+    previousPassColor.a);
+    }
+    ,
+    };
+
+
+
+
+    vec4 previousPassColor = texture2D(tDiffuse, vUv);
+
+
+    gl_FragColor = vec4(
+        previousPassColor.rgb * color,
+        previousPassColor.a);
+
+
+    const gui = new GUI();
+    gui.add(colorPass.uniforms.color.value, 'r', 0, 4).name('red');
+    gui.add(colorPass.uniforms.color.value, 'g', 0, 4).name('green');
+    gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
