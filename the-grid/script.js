@@ -53,7 +53,7 @@ function drawGrid(numRows, numCols, rowWidth, colWidth, randomOffset, interpolat
 
 
 function preload() {
-    img = loadImage('input.jpg')
+    img = loadImage('teletubbies-jpg-2983617398.jpg')
     console.log(img);
 }
 

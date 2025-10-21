@@ -20,12 +20,15 @@ let allColumnsPoints = [];
 
 // Menu-related variables
 let sliderValues = {
-  numRows: 5,
-  numCols: 5,
-  rowWidth: 40,
-  colWidth: 40,
-  randomOffset: 3,
-  interpolationSteps: 8
+  numRows: 20,
+  numCols: 10,
+  rowWidth: 120,
+  colWidth: 120,
+  randomOffset: 10,
+  interpolationSteps: 8,
+  animationSpeed: 50,
+  maxShapes: 25,
+  strokeWeight: 1
 };
 let flags = {
   shadows: false,
@@ -33,53 +36,92 @@ let flags = {
 };
 let isAnimating = false;
 
-function drawGrid(numRows, numCols, rowWidth, colWidth, randomOffset, interpolationSteps) {
-    noFill();
-    // Create all points for the grid
+// Animation variables
+let currentShape = 10;
+// maxShapes and framesPerTransition are now controlled by sliders
+let transitionProgress = 0;
+let currentPoints = [];
+let nextPoints = [];
+
+function easeInOutQuad(t) {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+function generateGridPoints(numRows, numCols, rowWidth, colWidth, randomOffset, seed) {
+    randomSeed(seed);
+    let columnsPoints = [];
     for (let row = 0; row < numRows; row++) {
         let columnPoints = [];
         for (let col = 0; col < numCols; col++) {
-            let x = row * rowWidth + random(randomOffset); // Adjust scaling for display
-            let y = col * colWidth + random(randomOffset); // Adjust scaling for display
+            let x = row * rowWidth + random(randomOffset);
+            let y = col * colWidth + random(randomOffset);
             columnPoints.push(createVector(x, y));
         }
-        allColumnsPoints.push(columnPoints);
+        columnsPoints.push(columnPoints);
     }
+    return columnsPoints;
+}
+
+function drawGrid(points, interpolationSteps) {
+    noFill();
     // Interpolating between columns and drawing polygons
-    for (let index = 0; index < allColumnsPoints.length - 1; index++) {
-        let currentColumnPoints = allColumnsPoints[index];
-        let nextColumnPoints = allColumnsPoints[index + 1];
+    for (let index = 0; index < points.length - 1; index++) {
+        let currentColumnPoints = points[index];
+        let nextColumnPoints = points[index + 1];
         for (let step = 0; step < interpolationSteps; step++) {
             beginShape();
             for (let i = 0; i < currentColumnPoints.length; i++) {
                 let interpolatedX = lerp(currentColumnPoints[i].x, nextColumnPoints[i].x, step / interpolationSteps);
                 let interpolatedY = lerp(currentColumnPoints[i].y, nextColumnPoints[i].y, step / interpolationSteps);
-                //curveVertex(interpolatedX, interpolatedY);
                 vertex(interpolatedX, interpolatedY);
             }
-            endShape(); // Close the shape to form a polygon
+            endShape();
         }
     }
 }
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
-    noLoop();
+    // Generate initial points
+    currentPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 1), currentShape);
+    nextPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 2), currentShape + 1);
+    loop(); // Enable animation
 }
 
 function draw() {
     background(0);
-    let increment = 0
-    for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 7; j++) {
-            push()
-            translate(30 + 200 * j, 30 + 200 * i);
-            drawGrid(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * increment, sliderValues.interpolationSteps);
-            increment += 1;
-            pop()
-            stroke(255);
-            allColumnsPoints = []; 
+    stroke(255);
+    strokeWeight(sliderValues.strokeWeight);
+    
+    // Interpolate between current and next points
+    let easedProgress = easeInOutQuad(transitionProgress);
+    let interpolatedPoints = [];
+    for (let i = 0; i < currentPoints.length; i++) {
+        let interpolatedColumn = [];
+        for (let j = 0; j < currentPoints[i].length; j++) {
+            let x = lerp(currentPoints[i][j].x, nextPoints[i][j].x, easedProgress);
+            let y = lerp(currentPoints[i][j].y, nextPoints[i][j].y, easedProgress);
+            interpolatedColumn.push(createVector(x, y));
         }
+        interpolatedPoints.push(interpolatedColumn);
+    }
+    
+    // Draw the grid in the center
+    push();
+    translate(width / 2 - (sliderValues.numRows * sliderValues.rowWidth) / 2, height / 2 - (sliderValues.numCols * sliderValues.colWidth) / 2);
+    drawGrid(interpolatedPoints, sliderValues.interpolationSteps);
+    pop();
+    
+    // Update transition
+    transitionProgress += 1 / sliderValues.animationSpeed;
+    if (transitionProgress >= 1) {
+        transitionProgress = 0;
+        currentShape++;
+        if (currentShape >= sliderValues.maxShapes) {
+            currentShape = 0;
+        }
+        currentPoints = nextPoints.map(col => col.map(v => v.copy()));
+        nextPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 2), currentShape + 1);
     }
 }
 
@@ -104,6 +146,10 @@ function toggleMenu() {
 function updateSliderValue(property, value) {
     sliderValues[property] = parseFloat(value);
     document.getElementById(property + 'Value').textContent = value;
+    if (property === 'numRows' || property === 'numCols') {
+        currentPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 1), currentShape);
+        nextPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 2), currentShape + 1);
+    }
     redraw();
 }
 

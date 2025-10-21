@@ -1,15 +1,15 @@
 let particles1 = [];
 
-let num = 2500;
+let num = 1500;
 
 // Slider values
 let sliderValues = {
     strength: 0.5,
-    alpha: 0.5,
+    alpha: 0.8,
     zoom: 300,
     bgFade: 0.1,
     num: 2,
-    life: 10000,
+    life: 1000,
     animSpeed: 500,
     strokeW: 3,
     hue: 0,
@@ -27,7 +27,7 @@ let obstacle;
 let textObstacles = [];
 let inputText = "I B A";
 let font;
-let obstacleMode = "rectangle"; // "text", "circle", or "rectangle"
+let obstacleMode = "text"; // "text", "circle", or "rectangle"
 
 // flow direction control variables
 let flowAngle = 0; // angle in radians for particle flow direction
@@ -89,7 +89,7 @@ function updateTextObstacles() {
     let fontSize = 200;
     textSize(fontSize);
     let points = font.textToPoints(inputText, width / 2 - textWidth(inputText) / 2, height / 2 + fontSize / 3, fontSize, {
-        sampleFactor: 0.05
+        sampleFactor: 0.15
     });
     
     textObstacles = points;
@@ -137,7 +137,7 @@ function draw() {
         fill(sliderValues.hue, sliderValues.saturation, sliderValues.brightness, 0.3);
         noStroke();
         for (let pt of textObstacles) {
-            circle(pt.x, pt.y, 3);
+            // circle(pt.x, pt.y, 3);
         }
         pop();
     }

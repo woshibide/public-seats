@@ -15,7 +15,7 @@ let flags = {
     stroke: true,
     balls: false,
     bg: true,
-    anima: false
+    anima: true
 };
 
 // appearance variables
@@ -29,9 +29,19 @@ let fillHue = 60;
 let fillSat = 60;
 let fillBright = 100;
 let fillAlpha = 100;
+let theEmoji = '🌺';
+
+
+// text settings
+let sampleFactor = 0.06;
+let fontTextSize = 200;
+let displayMode = 'ellipse'; // 'ellipse' or 'text'
 
 // animation control
-let isAnimating = false;
+let isAnimating = true;
+
+// size sync state
+let sizeSyncEnabled = false;
 
 
 function preload() {
@@ -47,11 +57,20 @@ function setup() {
 
     background(0);
 
+    textAlign(CENTER);
+
     ellipseMode(CENTER);
     colorMode(HSB, 360, 100, 100, 100);
     noStroke();
     
-    points = font.textToPoints("very cool rehab", 200, 400, 200, {sampleFactor: 0.5});
+    
+    
+    // center the text
+    let textValue = "flowers";
+    let bounds = font.textBounds(textValue, 0, 0, fontTextSize);
+    let x = width/2 - bounds.w/2;
+    let y = height/2 + bounds.h/2;
+    points = font.textToPoints(textValue, x, y, fontTextSize, {sampleFactor: sampleFactor});
     console.log(points);
     
 
@@ -77,7 +96,15 @@ function draw() {
             noStroke();
         }
         fill(fillHue, fillSat, fillBright, fillAlpha);
-        ellipse(points[i].x, points[i].y, size, size);
+
+        // modes of displaying
+        if (displayMode === 'text') {
+            textSize(size);
+            // ddddd
+            text(theEmoji, points[i].x, points[i].y);
+        } else {
+            ellipse(points[i].x, points[i].y, size, size);
+        }
     }
 
     if (!flags.anima){
@@ -105,8 +132,20 @@ function updateSliderValue(property, value) {
     document.getElementById(property + 'Value').textContent = value;
     if (property === 'ellipseSizeMin') {
         ellipseSizeMin = numValue;
+        // if sync is enabled, update max to match min
+        if (sizeSyncEnabled) {
+            ellipseSizeMax = numValue;
+            document.getElementById('ellipseSizeMaxSlider').value = numValue;
+            document.getElementById('ellipseSizeMaxValue').textContent = numValue;
+        }
     } else if (property === 'ellipseSizeMax') {
         ellipseSizeMax = numValue;
+        // if sync is enabled, update min to match max
+        if (sizeSyncEnabled) {
+            ellipseSizeMin = numValue;
+            document.getElementById('ellipseSizeMinSlider').value = numValue;
+            document.getElementById('ellipseSizeMinValue').textContent = numValue;
+        }
     } else if (property === 'strokeHue') {
         strokeHue = numValue;
     } else if (property === 'strokeSat') {
@@ -123,6 +162,22 @@ function updateSliderValue(property, value) {
         fillBright = numValue;
     } else if (property === 'fillAlpha') {
         fillAlpha = numValue;
+    } else if (property === 'sampleFactor') {
+        sampleFactor = numValue;
+        // regenerate points with new sample factor
+        let textValue = document.getElementById('textInput').value;
+        let bounds = font.textBounds(textValue, 0, 0, fontTextSize);
+        let x = width/2 - bounds.w/2;
+        let y = height/2 + bounds.h/2;
+        points = font.textToPoints(textValue, x, y, fontTextSize, {sampleFactor: sampleFactor});
+    } else if (property === 'textSize') {
+        fontTextSize = numValue;
+        // regenerate points with new text size
+        let textValue = document.getElementById('textInput').value;
+        let bounds = font.textBounds(textValue, 0, 0, fontTextSize);
+        let x = width/2 - bounds.w/2;
+        let y = height/2 + bounds.h/2;
+        points = font.textToPoints(textValue, x, y, fontTextSize, {sampleFactor: sampleFactor});
     } else {
         sliderValues[property] = numValue; // for old ones if any
     }
@@ -131,9 +186,44 @@ function updateSliderValue(property, value) {
     }
 }
 
+function updateEmoji(value) {
+    // text(value, points[i].x, points[i].y);
+
+    theEmoji = value;
+
+    if (!flags.anima) {
+        redraw();
+    }
+}
+
+
+function toggleSizeSync(checked) {
+    sizeSyncEnabled = checked;
+    // if enabling sync, immediately sync max to min value
+    if (checked) {
+        ellipseSizeMax = ellipseSizeMin;
+        document.getElementById('ellipseSizeMaxSlider').value = ellipseSizeMin;
+        document.getElementById('ellipseSizeMaxValue').textContent = ellipseSizeMin;
+        if (!flags.anima) {
+            redraw();
+        }
+    }
+}
+
 // update text function
 function updateText(value) {
-    points = font.textToPoints(value, 200, 400, 200, {sampleFactor: 0.1});
+    let bounds = font.textBounds(value, 0, 0, fontTextSize);
+    let x = width/2 - bounds.w/2;
+    let y = height/2 + bounds.h/2;
+    points = font.textToPoints(value, x, y, fontTextSize, {sampleFactor: sampleFactor});
+    if (!flags.anima) {
+        redraw();
+    }
+}
+
+// change display mode function
+function changeDisplayMode(mode) {
+    displayMode = mode;
     if (!flags.anima) {
         redraw();
     }
@@ -182,4 +272,10 @@ function exportFrame() {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    // recenter text when window is resized
+    let textValue = document.getElementById('textInput').value;
+    let bounds = font.textBounds(textValue, 0, 0, fontTextSize);
+    let x = width/2 - bounds.w/2;
+    let y = height/2 + bounds.h/2;
+    points = font.textToPoints(textValue, x, y, fontTextSize, {sampleFactor: sampleFactor});
 }

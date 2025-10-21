@@ -1,8 +1,8 @@
 let bs = [];
-let bsNum = 1000;
-let pr = 50; // perception radius of neighbours
-let force = 2 ;
-let speed = 10;
+let bsNum = 500;
+let pr = 200; // perception radius of neighbours
+let force = 1 ;
+let speed = 5;
 
 // quadtree 
 let quadtree;

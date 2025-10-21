@@ -497,16 +497,6 @@ function generateColorScheme(baseColor, scheme = 'complementary') {
   }
 }
 
-/*
-const baseColor = '#ff0000';
-console.log('Default (Complementary):', generateColorScheme(baseColor));
-console.log('Complementary:', generateColorScheme(baseColor, 'complementary'));
-console.log('Triadic:', generateColorScheme(baseColor, 'triadic'));
-console.log('Split-complementary:', generateColorScheme(baseColor, 'split-complementary'));
-console.log('Analogous:', generateColorScheme(baseColor, 'analogous'));
-console.log('Monochromatic:', generateColorScheme(baseColor, 'monochromatic'));
-*/
-
 function flick(color0, color1, interval) {
   if (frameCount % interval === 0) {
     return color0;

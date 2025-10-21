@@ -1,0 +1,6 @@
+- import halftonepass
+- add pointcloudgroup and rotate it in animate
+- add halftonepass to finalcomposer after mixpass and before outputpass
+- add all point meshes to pointcloudgroup instead of scene
+- remove old mesh rotation logic
+- update onWindowResize to resize halftonepass

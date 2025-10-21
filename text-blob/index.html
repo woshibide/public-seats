@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iba iba iba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.5/p5.min.js"></script> -->
 </head>
@@ -16,89 +16,140 @@
             <span class="dropdown-arrow">▼</span>
         </div>
         <div class="menu-content" id="menuContent">
-            <div class="slider-group">
-                <label class="slider-label">Ellipse Size Min</label>
-                <div class="slider-container">
-                    <input type="range" min="1" max="50" value="5" class="slider" id="ellipseSizeMinSlider" oninput="updateSliderValue('ellipseSizeMin', this.value)">
-                    <span class="slider-value" id="ellipseSizeMinValue">5</span>
+            <!-- text settings section -->
+            <div class="slider-section">
+                <h3>Text Settings</h3>
+                <div class="slider-group">
+                    <label class="slider-label">Display Text</label>
+                    <input type="text" id="textInput" class="text-input" value="flowers" oninput="updateText(this.value)">
+                </div>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Text Size</label>
+                    <div class="slider-container">
+                        <input type="range" min="50" max="500" step="10" value="200" class="slider" id="textSizeSlider" oninput="updateSliderValue('textSize', this.value)">
+                        <span class="slider-value" id="textSizeValue">200</span>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Sample Factor</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="0.3" step="0.005" value="0.06" class="slider" id="sampleFactorSlider" oninput="updateSliderValue('sampleFactor', this.value)">
+                        <span class="slider-value" id="sampleFactorValue">0.06</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Ellipse Size Max</label>
-                <div class="slider-container">
-                    <input type="range" min="1" max="50" value="20" class="slider" id="ellipseSizeMaxSlider" oninput="updateSliderValue('ellipseSizeMax', this.value)">
-                    <span class="slider-value" id="ellipseSizeMaxValue">20</span>
+
+            <!-- display mode section -->
+            <div class="slider-section">
+                <h3>Display Mode</h3>
+                <div class="slider-group">
+                    <label class="slider-label">Render Mode</label>
+                    <select class="control-select" id="displayModeSelect" onchange="changeDisplayMode(this.value)">
+                        <option value="ellipse">Ellipse</option>
+                        <option value="text">Emoji</option>
+                    </select>
+                    <input type="text" id="pointText" class="text-input" value="🌺" oninput="updateEmoji(this.value)">
                 </div>
             </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Stroke Hue</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="360" value="0" class="slider" id="strokeHueSlider" oninput="updateSliderValue('strokeHue', this.value)">
-                    <span class="slider-value" id="strokeHueValue">0</span>
+
+            <!-- size settings section -->
+            <div class="slider-section">
+                <h3>Size Settings</h3>
+                <div class="slider-group">
+                    <label class="slider-label">Size Min</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="50" value="15" class="slider" id="ellipseSizeMinSlider" oninput="updateSliderValue('ellipseSizeMin', this.value)">
+                        <span class="slider-value" id="ellipseSizeMinValue">15</span>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Size Max</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="50" value="25" class="slider" id="ellipseSizeMaxSlider" oninput="updateSliderValue('ellipseSizeMax', this.value)">
+                        <span class="slider-value" id="ellipseSizeMaxValue">25</span>
+                    </div>
+                </div>
+                <div class="slider-group">
+                    <label class="slider-label">
+                        <input type="checkbox" id="syncSizeCheckbox" onchange="toggleSizeSync(this.checked)">
+                        Sync Sizes
+                    </label>
                 </div>
             </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Stroke Saturation</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="100" value="100" class="slider" id="strokeSatSlider" oninput="updateSliderValue('strokeSat', this.value)">
-                    <span class="slider-value" id="strokeSatValue">100</span>
+
+            <!-- stroke settings section -->
+            <div class="slider-section">
+                <h3>Stroke Settings</h3>
+                <div class="slider-group">
+                    <label class="slider-label">Hue</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="360" value="0" class="slider" id="strokeHueSlider" oninput="updateSliderValue('strokeHue', this.value)">
+                        <span class="slider-value" id="strokeHueValue">0</span>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Saturation</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="100" class="slider" id="strokeSatSlider" oninput="updateSliderValue('strokeSat', this.value)">
+                        <span class="slider-value" id="strokeSatValue">100</span>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Brightness</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="100" class="slider" id="strokeBrightSlider" oninput="updateSliderValue('strokeBright', this.value)">
+                        <span class="slider-value" id="strokeBrightValue">100</span>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Alpha</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="0" class="slider" id="strokeAlphaSlider" oninput="updateSliderValue('strokeAlpha', this.value)">
+                        <span class="slider-value" id="strokeAlphaValue">0</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Stroke Brightness</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="100" value="100" class="slider" id="strokeBrightSlider" oninput="updateSliderValue('strokeBright', this.value)">
-                    <span class="slider-value" id="strokeBrightValue">100</span>
+
+            <!-- fill settings section -->
+            <div class="slider-section">
+                <h3>Fill Settings</h3>
+                <div class="slider-group">
+                    <label class="slider-label">Hue</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="360" value="60" class="slider" id="fillHueSlider" oninput="updateSliderValue('fillHue', this.value)">
+                        <span class="slider-value" id="fillHueValue">60</span>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Stroke Alpha</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="100" value="100" class="slider" id="strokeAlphaSlider" oninput="updateSliderValue('strokeAlpha', this.value)">
-                    <span class="slider-value" id="strokeAlphaValue">100</span>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Saturation</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="60" class="slider" id="fillSatSlider" oninput="updateSliderValue('fillSat', this.value)">
+                        <span class="slider-value" id="fillSatValue">60</span>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Fill Hue</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="360" value="200" class="slider" id="fillHueSlider" oninput="updateSliderValue('fillHue', this.value)">
-                    <span class="slider-value" id="fillHueValue">200</span>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Brightness</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="100" class="slider" id="fillBrightSlider" oninput="updateSliderValue('fillBright', this.value)">
+                        <span class="slider-value" id="fillBrightValue">100</span>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Fill Saturation</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="100" value="100" class="slider" id="fillSatSlider" oninput="updateSliderValue('fillSat', this.value)">
-                    <span class="slider-value" id="fillSatValue">100</span>
+                
+                <div class="slider-group">
+                    <label class="slider-label">Alpha</label>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="100" class="slider" id="fillAlphaSlider" oninput="updateSliderValue('fillAlpha', this.value)">
+                        <span class="slider-value" id="fillAlphaValue">100</span>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Fill Brightness</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="100" value="100" class="slider" id="fillBrightSlider" oninput="updateSliderValue('fillBright', this.value)">
-                    <span class="slider-value" id="fillBrightValue">100</span>
-                </div>
-            </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Fill Alpha</label>
-                <div class="slider-container">
-                    <input type="range" min="0" max="100" value="100" class="slider" id="fillAlphaSlider" oninput="updateSliderValue('fillAlpha', this.value)">
-                    <span class="slider-value" id="fillAlphaValue">100</span>
-                </div>
-            </div>
-            
-            <div class="slider-group">
-                <label class="slider-label">Display Text</label>
-                <input type="text" id="textInput" value="iba iba iba" oninput="updateText(this.value)">
             </div>
             
             <div class="button-group">
