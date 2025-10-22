@@ -1,34 +1,19 @@
-////////////////////////////////////////////////////////
-
-/*
-This piece is an exploration of distortion, movement, and transformation within a structured framework.
-The artwork consists of a grid of progressive deformations, where an initial order—represented by evenly spaced parallel lines—gradually succumbs to an increasing state of disorder.
-The lines begin to ripple, bend, and fold, creating an illusion of three-dimensionality within a two-dimensional space.
-
-The sequential nature of the composition evokes the language of digital simulation, reminiscent of algorithmic manipulations or generative art.
-It suggests a process unfolding over time, akin to fabric being stretched and crumpled by an unseen force.
-The visual tension arises from the contrast between the initial order and the chaotic disruption, mirroring broader themes of instability, entropy, and transformation.
-
-This work resonates with Op Art and kinetic art influences, where the viewer's perception becomes an active component in experiencing depth and motion.
-The subtle yet systematic deterioration of the structure also draws parallels with data corruption, glitch aesthetics, and the fragility of digital and organic systems.
-
-By presenting this gradual shift in form, the piece invites contemplation on the nature of control and unpredictability—whether in physical materials, digital landscapes, or societal structures.
-It is a meditation on impermanence, where order is never static but always in flux.
-
-*/
 let allColumnsPoints = [];
 
 // Menu-related variables
 let sliderValues = {
-  numRows: 20,
-  numCols: 10,
-  rowWidth: 120,
-  colWidth: 120,
-  randomOffset: 10,
-  interpolationSteps: 8,
-  animationSpeed: 50,
-  maxShapes: 25,
-  strokeWeight: 1
+  numRows:            { min: 2, value: 5, max: 10 },
+  numCols:            { min: 2, value: 4, max: 10 },
+  rowWidth:           { min: 2, value: 88, max: 2000 },
+  colWidth:           { min: 2, value: 44, max: 2000 },
+  randomOffset:       { min: 0, value: 8, max: 500 },
+  interpolationSteps: { min: 1, value: 8, max: 200 },
+  animationSpeed:     { min: 1, value: 300, max: 1000 },
+  maxShapes:          { min: 1, value: 4, max: 50 },
+  strokeWeight:       { min: 0, value: 0, max: 100 },
+  bgColor:            { value: '#ffffff' },
+  strokeColor:        { value: '#000000' },
+  fillColor:          { value: '#000000' }
 };
 let flags = {
   shadows: false,
@@ -36,8 +21,10 @@ let flags = {
 };
 let isAnimating = false;
 
+const presetManager = new PresetManager();
+
 // Animation variables
-let currentShape = 10;
+let currentShape = 0;
 // maxShapes and framesPerTransition are now controlled by sliders
 let transitionProgress = 0;
 let currentPoints = [];
@@ -63,7 +50,7 @@ function generateGridPoints(numRows, numCols, rowWidth, colWidth, randomOffset, 
 }
 
 function drawGrid(points, interpolationSteps) {
-    noFill();
+    // noFill();
     // Interpolating between columns and drawing polygons
     for (let index = 0; index < points.length - 1; index++) {
         let currentColumnPoints = points[index];
@@ -80,18 +67,26 @@ function drawGrid(points, interpolationSteps) {
     }
 }
 
-function setup() {
-	createCanvas(windowWidth, windowHeight);
-    // Generate initial points
-    currentPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 1), currentShape);
-    nextPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 2), currentShape + 1);
-    loop(); // Enable animation
+function drawGridToGraphics(g, points, interpolationSteps) {
+    for (let index = 0; index < points.length - 1; index++) {
+        let currentColumnPoints = points[index];
+        let nextColumnPoints = points[index + 1];
+        for (let step = 0; step < interpolationSteps; step++) {
+            g.beginShape();
+            for (let i = 0; i < currentColumnPoints.length; i++) {
+                let interpolatedX = lerp(currentColumnPoints[i].x, nextColumnPoints[i].x, step / interpolationSteps);
+                let interpolatedY = lerp(currentColumnPoints[i].y, nextColumnPoints[i].y, step / interpolationSteps);
+                g.vertex(interpolatedX, interpolatedY);
+            }
+            g.endShape();
+        }
+    }
 }
 
-function draw() {
-    background(0);
-    stroke(255);
-    strokeWeight(sliderValues.strokeWeight);
+function drawScene(g = window) {
+    g.stroke(sliderValues.strokeColor.value);
+    g.fill(sliderValues.fillColor.value);
+    g.strokeWeight(sliderValues.strokeWeight.value);
     
     // Interpolate between current and next points
     let easedProgress = easeInOutQuad(transitionProgress);
@@ -107,26 +102,112 @@ function draw() {
     }
     
     // Draw the grid in the center
-    push();
-    translate(width / 2 - (sliderValues.numRows * sliderValues.rowWidth) / 2, height / 2 - (sliderValues.numCols * sliderValues.colWidth) / 2);
-    drawGrid(interpolatedPoints, sliderValues.interpolationSteps);
-    pop();
+    g.push();
+    // Calculate the actual bounds of the interpolated points
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (let col of interpolatedPoints) {
+        for (let point of col) {
+            if (point.x < minX) minX = point.x;
+            if (point.x > maxX) maxX = point.x;
+            if (point.y < minY) minY = point.y;
+            if (point.y > maxY) maxY = point.y;
+        }
+    }
+    let centerX = (minX + maxX) / 2;
+    let centerY = (minY + maxY) / 2;
+    g.translate(width / 2 - centerX, height / 2 - centerY);
+    drawGridToGraphics(g, interpolatedPoints, sliderValues.interpolationSteps.value);
+    g.pop();
+}
+
+function preload() {
+    // img = loadImage('chair.jpg');
+}
+
+function setup() {
+
+    strokeCap(SQUARE);
+	createCanvas(windowWidth, windowHeight);
+    // Generate initial points
+    currentPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 1), currentShape);
+    nextPoints    = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 2), currentShape + 1);
+    
+    // Initialize slider DOM elements to match sliderValues
+    initializeSliders();
+    
+    loop(); // Enable animation
+}
+
+function draw() {
+    background(sliderValues.bgColor.value);
+
+    // background(img, width, height);
+
+    drawScene();
     
     // Update transition
-    transitionProgress += 1 / sliderValues.animationSpeed;
+    transitionProgress += 2 / sliderValues.animationSpeed.value;
     if (transitionProgress >= 1) {
         transitionProgress = 0;
         currentShape++;
-        if (currentShape >= sliderValues.maxShapes) {
+        if (currentShape >= sliderValues.maxShapes.value) {
             currentShape = 0;
         }
         currentPoints = nextPoints.map(col => col.map(v => v.copy()));
-        nextPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 2), currentShape + 1);
+        nextPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 2), currentShape + 1);
     }
 }
 
 
 //////////////////////////////////
+
+// Initialize slider DOM elements to match sliderValues
+function initializeSliders() {
+    for (let prop in sliderValues) {
+        let element = document.getElementById(prop + 'Slider') || document.getElementById(prop + 'Picker');
+        if (element) {
+            if (sliderValues[prop].min !== undefined) {
+                element.min = sliderValues[prop].min;
+                element.max = sliderValues[prop].max;
+            }
+            element.value = sliderValues[prop].value;
+            let valueElement = document.getElementById(prop + 'Value');
+            if (valueElement) {
+                valueElement.textContent = sliderValues[prop].value;
+            }
+        }
+    }
+}
+
+// Function to dynamically set multiple slider values
+function setSliderValues(newValues) {
+    for (let prop in newValues) {
+        if (newValues.hasOwnProperty(prop) && sliderValues.hasOwnProperty(prop)) {
+            let val = newValues[prop];
+            if (typeof val === 'number') {
+                updateSliderValue(prop, val);
+            } else if (typeof val === 'string') {
+                updateColorValue(prop, val);
+            } else if (typeof val === 'object') {
+                if (val.min !== undefined) sliderValues[prop].min = val.min;
+                if (val.value !== undefined) {
+                    if (typeof val.value === 'number') {
+                        updateSliderValue(prop, val.value);
+                    } else {
+                        updateColorValue(prop, val.value);
+                    }
+                }
+                if (val.max !== undefined) sliderValues[prop].max = val.max;
+                // Update slider min/max
+                let slider = document.getElementById(prop + 'Slider');
+                if (slider) {
+                    slider.min = sliderValues[prop].min;
+                    slider.max = sliderValues[prop].max;
+                }
+            }
+        }
+    }
+}
 
 // menu toggle function
 function toggleMenu() {
@@ -142,14 +223,35 @@ function toggleMenu() {
     }
 }
 
+// presets toggle function
+function togglePresets() {
+    const presetsContent = document.getElementById('presetsContent');
+    const arrow = document.querySelector('.presets-header .dropdown-arrow');
+
+    if (presetsContent.classList.contains('expanded')) {
+        presetsContent.classList.remove('expanded');
+        arrow.classList.remove('expanded');
+    } else {
+        presetsContent.classList.add('expanded');
+        arrow.classList.add('expanded');
+        updatePresetDropdown();
+    }
+}
+
 // slider update function
 function updateSliderValue(property, value) {
-    sliderValues[property] = parseFloat(value);
+    sliderValues[property].value = parseFloat(value);
     document.getElementById(property + 'Value').textContent = value;
     if (property === 'numRows' || property === 'numCols') {
-        currentPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 1), currentShape);
-        nextPoints = generateGridPoints(sliderValues.numRows, sliderValues.numCols, sliderValues.rowWidth, sliderValues.colWidth, sliderValues.randomOffset * (currentShape + 2), currentShape + 1);
+        currentPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 1), currentShape);
+        nextPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 2), currentShape + 1);
     }
+    redraw();
+}
+
+// color update function
+function updateColorValue(property, value) {
+    sliderValues[property].value = value;
     redraw();
 }
 
@@ -188,8 +290,183 @@ function exportFrame() {
     saveCanvas('animation_frame', 'png');
 }
 
+function exportGraphics() {
+    let g = createGraphics(width, height);
+    g.clear(); // Set to transparent
+    drawScene(g);
+    g.save('graphics_no_bg.png');
+}
 
+// Preset functions
+function updatePresetDropdown() {
+    const select = document.getElementById('presetSelect');
+    const names = presetManager.getPresetNames();
+    
+    // Clear existing options except the first
+    select.innerHTML = '<option value="">Select a preset...</option>';
+    
+    // Add preset options
+    names.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+}
 
+function savePreset() {
+    const nameInput = document.getElementById('presetNameInput');
+    const name = nameInput.value.trim();
+    const statusDiv = document.getElementById('presetStatus');
+    
+    if (!name) {
+        statusDiv.textContent = 'Please enter a preset name';
+        statusDiv.style.color = '#ff6b6b';
+        return;
+    }
+    
+    try {
+        // Capture current state
+        const state = {
+            sliderValues: { ...sliderValues },
+            flags: { ...flags }
+        };
+        
+        // Check if preset exists
+        if (presetManager.presetExists(name)) {
+            if (!confirm(`Preset "${name}" already exists. Overwrite?`)) {
+                statusDiv.textContent = 'Save cancelled';
+                statusDiv.style.color = '#ffa500';
+                return;
+            }
+        }
+        
+        const result = presetManager.savePreset(name, state, true);
+        statusDiv.textContent = result.message;
+        statusDiv.style.color = '#4ecdc4';
+        nameInput.value = '';
+        updatePresetDropdown();
+    } catch (error) {
+        statusDiv.textContent = error.message;
+        statusDiv.style.color = '#ff6b6b';
+    }
+}
+
+function loadPreset() {
+    const select = document.getElementById('presetSelect');
+    const selectedName = select.value;
+    const statusDiv = document.getElementById('presetStatus');
+    
+    if (!selectedName) {
+        statusDiv.textContent = 'Please select a preset';
+        statusDiv.style.color = '#ff6b6b';
+        return;
+    }
+    
+    try {
+        const result = presetManager.loadPreset(selectedName);
+        const state = result.state;
+        
+        // Apply slider values
+        if (state.sliderValues) {
+            Object.keys(state.sliderValues).forEach(key => {
+                if (sliderValues[key]) {
+                    sliderValues[key].value = state.sliderValues[key].value;
+                    // Update DOM
+                    const slider = document.getElementById(key + 'Slider');
+                    const valueSpan = document.getElementById(key + 'Value');
+                    if (slider) slider.value = state.sliderValues[key].value;
+                    if (valueSpan) valueSpan.textContent = state.sliderValues[key].value;
+                }
+            });
+        }
+        
+        // Apply flags
+        if (state.flags) {
+            Object.assign(flags, state.flags);
+        }
+        
+        // Regenerate points if grid dimensions changed
+        currentPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 1), currentShape);
+        nextPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 2), currentShape + 1);
+        
+        statusDiv.textContent = result.message;
+        statusDiv.style.color = '#4ecdc4';
+        redraw();
+    } catch (error) {
+        statusDiv.textContent = error.message;
+        statusDiv.style.color = '#ff6b6b';
+    }
+}
+
+function deletePreset() {
+    const select = document.getElementById('presetSelect');
+    const selectedName = select.value;
+    const statusDiv = document.getElementById('presetStatus');
+    
+    if (!selectedName) {
+        statusDiv.textContent = 'Please select a preset to delete';
+        statusDiv.style.color = '#ff6b6b';
+        return;
+    }
+    
+    if (!confirm(`Delete preset "${selectedName}"?`)) {
+        statusDiv.textContent = 'Delete cancelled';
+        statusDiv.style.color = '#ffa500';
+        return;
+    }
+    
+    try {
+        const result = presetManager.deletePreset(selectedName);
+        statusDiv.textContent = result.message;
+        statusDiv.style.color = '#4ecdc4';
+        updatePresetDropdown();
+    } catch (error) {
+        statusDiv.textContent = error.message;
+        statusDiv.style.color = '#ff6b6b';
+    }
+}
+
+function exportPresets() {
+    const data = presetManager.exportPresets();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'grids-presets.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    const statusDiv = document.getElementById('presetStatus');
+    statusDiv.textContent = 'Presets exported successfully';
+    statusDiv.style.color = '#4ecdc4';
+}
+
+// Handle import file selection
+document.getElementById('importFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const statusDiv = document.getElementById('presetStatus');
+    
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            const result = presetManager.importPresets(data);
+            statusDiv.textContent = result.message;
+            statusDiv.style.color = '#4ecdc4';
+            updatePresetDropdown();
+        } catch (error) {
+            statusDiv.textContent = 'Import failed: ' + error.message;
+            statusDiv.style.color = '#ff6b6b';
+        }
+    };
+    reader.readAsText(file);
+});
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);

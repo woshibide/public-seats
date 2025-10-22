@@ -12,7 +12,7 @@
 <body>
     <div class="menu-container">
         <div class="menu-header" onclick="toggleMenu()">
-            <h2>Menu</h2>
+            <h2>*</h2>
             <span class="dropdown-arrow">▼</span>
         </div>
         <div class="menu-content" id="menuContent">
@@ -41,7 +41,7 @@
             </div>
             
             <div class="slider-group">
-                <label class="slider-label">Column Width</label>
+                <label class="slider-label">Column Height</label>
                 <div class="slider-container">
                     <input type="range" min="20" max="100" value="40" class="slider" id="colWidthSlider" oninput="updateSliderValue('colWidth', this.value)">
                     <span class="slider-value" id="colWidthValue">40</span>
@@ -83,25 +83,70 @@
             <div class="slider-group">
                 <label class="slider-label">Stroke Weight</label>
                 <div class="slider-container">
-                    <input type="range" min="1" max="10" value="1" class="slider" id="strokeWeightSlider" oninput="updateSliderValue('strokeWeight', this.value)">
+                    <input type="range" min="0" max="10" value="1" class="slider" id="strokeWeightSlider" oninput="updateSliderValue('strokeWeight', this.value)">
                     <span class="slider-value" id="strokeWeightValue">1</span>
                 </div>
             </div>
-            
+            <div class="slider-group">
+                <div class="color-group">
+                    <label class="color-label">Background</label>
+                    <input type="color" id="bgColorPicker" value="#ffffff" oninput="updateColorValue('bgColor', this.value)">
+                </div>
+                
+                <div class="color-group">
+                    <label class="color-label">Stroke</label>
+                    <input type="color" id="strokeColorPicker" value="#000000" oninput="updateColorValue('strokeColor', this.value)">
+                </div>
+                
+                <div class="color-group">
+                    <label class="color-label">Fill</label>
+                    <input type="color" id="fillColorPicker" value="#000000" oninput="updateColorValue('fillColor', this.value)">
+                </div>
+            </div>
             <div class="button-group">
-                <button class="control-button" onclick="toggleFlag('shadows')">Toggle Shadows</button>
-                <button class="control-button" onclick="toggleFlag('mode')">Toggle Mode</button>
+                <button class="control-button" id="stopButton" onclick="toggleAnimation()">Stop Animation</button>
             </div>
             
             <div class="button-group">
-                <button class="control-button" id="stopButton" onclick="toggleAnimation()">Stop Animation</button>
                 <button class="control-button" id="exportButton" onclick="exportFrame()">Export Frame</button>
+                <button class="control-button" id="exportGraphicsButton" onclick="exportGraphics()">Export Graphics</button>
+            </div>
+            
+            <!-- Presets Section -->
+            <div class="presets-section">
+                <div class="presets-header" onclick="togglePresets()">
+                    <h3>Presets</h3>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="presets-content" id="presetsContent">
+                    <div class="preset-group">
+                        <input type="text" id="presetNameInput" placeholder="Preset name" class="preset-input">
+                        <button class="control-button" onclick="savePreset()">Save Preset</button>
+                    </div>
+                    
+                    <div class="preset-group">
+                        <select id="presetSelect" class="preset-select">
+                            <option value="">Select a preset...</option>
+                        </select>
+                        <button class="control-button" onclick="loadPreset()">Load</button>
+                        <button class="control-button" onclick="deletePreset()">Delete</button>
+                    </div>
+                    
+                    <div class="preset-group">
+                        <button class="control-button" onclick="exportPresets()">Export Presets</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                        <button class="control-button" onclick="document.getElementById('importFile').click()">Import Presets</button>
+                    </div>
+                    
+                    <div id="presetStatus" class="preset-status"></div>
+                </div>
             </div>
         </div>
     </div>
     
     <div id="p5-canvas"></div>
 
-    <script src="script.js"></script>
+    <script src="presets.js" defer></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

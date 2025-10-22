@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iba iba iba</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.5/p5.min.js"></script> -->
+</head>
+<body>
+    <div class="menu-container">
+        <div class="menu-header" onclick="toggleMenu()">
+            <h2>Menu</h2>
+            <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="menu-content" id="menuContent">
+            <div class="slider-group">
+                <label class="slider-label">Number of Rows</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="50" value="10" class="slider" id="numRowsSlider" oninput="updateSliderValue('numRows', this.value)">
+                    <span class="slider-value" id="numRowsValue">10</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Number of Columns</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="50" value="4" class="slider" id="numColsSlider" oninput="updateSliderValue('numCols', this.value)">
+                    <span class="slider-value" id="numColsValue">4</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Row Width</label>
+                <div class="slider-container">
+                    <input type="range" min="50" max="500" value="200" class="slider" id="rowWidthSlider" oninput="updateSliderValue('rowWidth', this.value)">
+                    <span class="slider-value" id="rowWidthValue">200</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Column Width</label>
+                <div class="slider-container">
+                    <input type="range" min="50" max="500" value="200" class="slider" id="colWidthSlider" oninput="updateSliderValue('colWidth', this.value)">
+                    <span class="slider-value" id="colWidthValue">200</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Random Offset</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="200" value="30" class="slider" id="randomOffsetSlider" oninput="updateSliderValue('randomOffset', this.value)">
+                    <span class="slider-value" id="randomOffsetValue">30</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Interpolation Steps</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="50" value="15" class="slider" id="interpolationStepsSlider" oninput="updateSliderValue('interpolationSteps', this.value)">
+                    <span class="slider-value" id="interpolationStepsValue">15</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Stroke Weight</label>
+                <div class="slider-container">
+                    <input type="range" min="0.1" max="10" step="0.1" value="6" class="slider" id="strokeWeightSlider" oninput="updateSliderValue('strokeWeight', this.value)">
+                    <span class="slider-value" id="strokeWeightValue">6</span>
+                </div>
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">Upload Image</label>
+                <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(this)">
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" onclick="refreshSketch()">Refresh Sketch</button>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" onclick="toggleFlag('shadows')">Toggle Shadows</button>
+                <button class="control-button" onclick="toggleFlag('mode')">Toggle Mode</button>
+            </div>
+            
+            <div class="button-group">
+                <button class="control-button" id="stopButton" onclick="toggleAnimation()">Stop Animation</button>
+                <button class="control-button" id="exportButton" onclick="exportFrame()">Export Frame</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="p5-canvas"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
