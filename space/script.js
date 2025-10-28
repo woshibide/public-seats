@@ -1,45 +1,86 @@
 let newStar;
 let starArray = [];
 let h2, w2, d2; 
-let maxStars = 20000; 
+let maxStars = 5000;
 let newStarsPerFrame = 50;
-let speedMin = 0.2;
-let speedMax = 5;
-let sizeIncrMax = 0.03;
-let ageThreshold = 200;
-let noiseScale = 0.001;
-let movementSensitivity = 0.05;
+let speedMin = 0.05;
+let speedMax = 0.5;
+let sizeIncrMax  = 3;
+let ageThreshold = 20;
+let noiseScale = 0.01;
+let movementSensitivity = 0.005;
 let paused = false;
-let sliderX, sliderY;
 let fadeMax = 255;
 let fadeMin = -10; 
 
+let currentAnima = 0;
+let animaState = [
+  {
+    x: 120,
+    y: 20
+  },
+  {
+    x: 10,
+    y: -5000
+  },
+  {
+    x: 100,
+    y: 5000
+  }
+];
+
+// let sliderX = 10;
+// let sliderY = 200;
+
+function calculateCanvasSize() {
+  // 4/5 for insta posts or 1.91:1
+  let aspectRatio = 16 / 9; // width / height for Instagram story
+  let canvasWidth, canvasHeight;
+  if (windowWidth / windowHeight > aspectRatio) {
+    canvasHeight = windowHeight;
+    canvasWidth = canvasHeight * aspectRatio;
+  } else {
+    canvasWidth = windowWidth;
+    canvasHeight = canvasWidth / aspectRatio;
+  }
+  return { canvasWidth, canvasHeight };
+}
+
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  let { canvasWidth, canvasHeight } = calculateCanvasSize();
+  createCanvas(canvasWidth, canvasHeight);
   w2 = width / 2;
   h2 = height / 2;
   d2 = dist(0, 0, w2, h2);
   noStroke();
   newStar = new Star();
   background(0);
-  sliderX = width / 2;
-  sliderY = height / 2;
-  // document.getElementById('xSlider').max = width;
-  // document.getElementById('xSlider').value = sliderX;
-  // document.getElementById('ySlider').max = height;
-  // document.getElementById('ySlider').value = sliderY;
-  updateSliderValue('x', sliderX);
-  updateSliderValue('y', sliderY);
+
+  frameRate(25);
+  textSize(24);
+  textAlign(CENTER, LEFT);
 }
 
 function draw() {
 
-    
   if (!paused) {
+
+    if (frameCount % 75 == 0) {
+      currentAnima = (currentAnima + 1) % animaState.length;
+    }
+    sliderX = animaState[currentAnima].x;
+    sliderY = animaState[currentAnima].y;
+
     fill(0, map(dist(sliderX, sliderY, w2, h2), 0, d2, fadeMax, fadeMin));
     rect(0, 0, width, height);
     fill(255);
     newStar.render();
+
+    push();
+    fill(255, 0, 0);
+    text(currentAnima, 20, 40);
+    pop();
+
 
     // Add new stars
     for (let i = 0; i < newStarsPerFrame; i++) {
@@ -65,18 +106,11 @@ function draw() {
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+  let { canvasWidth, canvasHeight } = calculateCanvasSize();
+  resizeCanvas(canvasWidth, canvasHeight);
   w2 = width / 2;
   h2 = height / 2;
   d2 = dist(0, 0, w2, h2);
-  sliderX = width / 2;
-  sliderY = height / 2;
-  document.getElementById('xSlider').max = width;
-  document.getElementById('xSlider').value = sliderX;
-  document.getElementById('ySlider').max = height;
-  document.getElementById('ySlider').value = sliderY;
-  updateSliderValue('x', sliderX);
-  updateSliderValue('y', sliderY);
 }
 
 class Star {
@@ -122,6 +156,12 @@ function togglePause() {
   paused = !paused;
 }
 
+function keyPressed(){
+  if (key == " "){
+    togglePause();
+  }
+}
+
 function remakeAnimation() {
   starArray = [];
   newStar = new Star();
@@ -164,13 +204,13 @@ function updateMovementSensitivity(value) {
   movementSensitivity = parseFloat(value);
 }
 
-function updateX(value) {
-  sliderX = parseInt(value);
-}
+// function updateX(value) {
+//   sliderX = parseInt(value);
+// }
 
-function updateY(value) {
-  sliderY = parseInt(value);
-}
+// function updateY(value) {
+//   sliderY = parseInt(value);
+// }
 
 function updateFadeMax(value) {
   fadeMax = parseInt(value);

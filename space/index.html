@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iba iba iba</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-    <link rel="stylesheet" href="../styles.css">
+    <!-- <link rel="stylesheet" href="../styles.css"> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.5/p5.min.js"></script> -->
 </head>
-<body>
+<body style="
+    display: flex;
+    overflow: hidden;
+    background-color: #111;
+"
+
+>
     <!-- <div class="menu-container">
         <div class="menu-header" onclick="toggleMenu()">
             <h2>Menu</h2>
@@ -123,7 +129,16 @@
         </div>
     </div> -->
     
-    <div id="p5-canvas"></div>
+    <div id="p5-canvas"
+         style="
+            /* aspect-ratio: 9/16; */
+            /* height: 100svh; */
+            width: auto;
+            flex: 1;
+         "
+    >
+
+    </div>
 
     <script src="script.js"></script>
 </body>
