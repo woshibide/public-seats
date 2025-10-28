@@ -1,0 +1,13 @@
+/* this file contains the styles for the html page, ensuring the canvas takes the full width of the screen */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* prevents scrollbars from appearing */
+}
+
+canvas {
+    display: block; /* removes the default inline-block spacing */
+    width: 100vw; /* sets the canvas width to the full viewport width */
+    height: 100vh; /* sets the canvas height to the full viewport height */
+}

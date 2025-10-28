@@ -233,6 +233,49 @@ body {
 }
 
 /* Presets styles */
+.controls-section {
+    margin: 0.625rem;
+    border-radius: 0.3125rem;
+    background-color: rgba(42, 42, 42, 0.3);
+    backdrop-filter: blur(1.25rem);
+    box-shadow: 0 0rem 0.1875rem rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.controls-header {
+    padding: 0.625rem 1rem;
+    background-color: rgba(58, 58, 58, 0.5);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.controls-header:hover {
+    background-color: rgba(74, 74, 74, 0.5);
+}
+
+.controls-header h3 {
+    margin: 0;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+}
+
+.controls-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: rgba(26, 26, 26, 0.2);
+}
+
+.controls-content.expanded {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Presets styles */
 .presets-section {
     margin: 0.625rem;
     border-radius: 0.3125rem;

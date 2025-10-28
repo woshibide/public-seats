@@ -24,10 +24,10 @@ function setup() {
   background(0);
   sliderX = width / 2;
   sliderY = height / 2;
-  document.getElementById('xSlider').max = width;
-  document.getElementById('xSlider').value = sliderX;
-  document.getElementById('ySlider').max = height;
-  document.getElementById('ySlider').value = sliderY;
+  // document.getElementById('xSlider').max = width;
+  // document.getElementById('xSlider').value = sliderX;
+  // document.getElementById('ySlider').max = height;
+  // document.getElementById('ySlider').value = sliderY;
   updateSliderValue('x', sliderX);
   updateSliderValue('y', sliderY);
 }
@@ -181,7 +181,7 @@ function updateFadeMin(value) {
 }
 
 function updateSliderValue(id, value) {
-  document.getElementById(id + 'Value').textContent = value;
+  // document.getElementById(id + 'Value').textContent = value;
 }
 
 function toggleMenu() {

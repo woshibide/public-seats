@@ -1,3 +1,12 @@
+/*
+
+- stroke
++ svg
++ video
++ playback controls
+
+*/
+
 let allColumnsPoints = [];
 
 // Menu-related variables
@@ -135,6 +144,9 @@ function setup() {
     // Initialize slider DOM elements to match sliderValues
     initializeSliders();
     
+    // Expand controls by default
+    toggleControls();
+    
     loop(); // Enable animation
 }
 
@@ -223,6 +235,20 @@ function toggleMenu() {
     }
 }
 
+// controls toggle function
+function toggleControls() {
+    const controlsContent = document.getElementById('controlsContent');
+    const arrow = document.querySelector('.controls-header .dropdown-arrow');
+
+    if (controlsContent.classList.contains('expanded')) {
+        controlsContent.classList.remove('expanded');
+        arrow.classList.remove('expanded');
+    } else {
+        controlsContent.classList.add('expanded');
+        arrow.classList.add('expanded');
+    }
+}
+
 // presets toggle function
 function togglePresets() {
     const presetsContent = document.getElementById('presetsContent');
@@ -287,14 +313,14 @@ function toggleAnimation() {
 }
 
 function exportFrame() {
-    saveCanvas('animation_frame', 'png');
+    saveCanvas('animation_frame', 'svg');
 }
 
 function exportGraphics() {
     let g = createGraphics(width, height);
     g.clear(); // Set to transparent
     drawScene(g);
-    g.save('graphics_no_bg.png');
+    g.save('graphics_no_bg.svg');
 }
 
 // Preset functions

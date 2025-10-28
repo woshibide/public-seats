@@ -1,0 +1,70 @@
+constructor() { this.init = this.init.bind(this), this.initLetters = this.initLetters.bind(this), this.draw = this.draw.bind(this), this.resize = this.resize.bind(this), this.handleResize = this.handleResize.bind(this), this.loadShape = this.loadShape.bind(this), this.init(), this.handleResize() } init() {
+        document.addEventListener("mousemove", this.mouseMove.bind(this)), window.addEventListener("scroll", this.scroll.bind(this)), this.destroy(), this.mouse = { pos: new ii(window.innerWidth / 2, window.innerHeight / 2), vel: new ii, strength: 0, mouseStrength: 1 }, this.scrollPos = 0, this.config = { mouse: { velDecay: .975, maxMovmentPercentage: .5 }, svg: {}, lines: { line: { angle: 10, color: window.accentColor, width: 20, move: { max: 50, min: 2 } } } }, this.lines = [], this.initLetters();
+        document.querySelectorAll(".dancing-image-container").forEach((t => { this.images.push(new ri(t)) }))
+    } initLetters() {
+        this.container = document.querySelector(".effect-container"), this.container && (this.observer = new IntersectionObserver((t => {
+            t.forEach((t => {
+                const e = t.isIntersecting;
+                this.areLinesInView = e
+            }))
+        })), this.observer.observe(this.container), this.canvas = this.container.querySelector("canvas"), this.paper = new si.PaperScope, this.paper.activate(), this.paper.setup(this.canvas), this.paper.view.onResize =
+            function (t, e = 50) {
+                let n;
+                return (...i) => { clearTimeout(n), n = setTimeout((() => { t.apply(this, i) }), e) }
+            }(this.handleResize))
+    } loadShape() {
+        let t = oi;
+        this.type = document.body.classList.contains("single") ? "s" : "spring", this.paper && ("s" === this.type && (t = this.isMobile ? li : hi, this.config.lines = { line: { angle: 10, color: "#FFF", width: this.isMobile ? 150 : 300, move: { max: this.isMobile ? 100 : 250, min: 10 } } }), this.paper.project.importSVG(t, { onLoad: t => { this.shape = t, this.resize() }, expandShapes: !0, insert: !1 }))
+    } handleResize() {
+        const t = window.innerWidth, e = this.windowWidth;
+        this.isMobile = window.innerWidth < 700, this.windowWidth = window.innerWidth, this.maxMov = Math.max(window.innerWidth, window.innerHeight) * this.config.mouse.maxMovmentPercentage, !this.shape || "s" === this.type && e >= 700 && t < 700 || "s" === this.type && e < 700 && t >= 700 ? this.loadShape() : this.resize()
+    } resize() {
+        this.paper.project.activeLayer.removeChildren(1);
+        let t = .45, e = 1.05;
+        "s" === this.type && (t = .75, e = 1.075), this.paper.view.viewSize = new si.Size(this.container.clientWidth, t * this.container.clientWidth), this.shape.fitBounds(this.paper.view.bounds), "s" === this.type && (this.shape.position.y = this.isMobile ? this.shape.bounds.height / 2 : this.shape.bounds.height / 2.5), this.shape.scale(e), this.config.svg.width = this.shape.bounds.width, this.config.svg.height = this.shape.bounds.height, this.workPaths = this.extractPaths(this.shape), this.bounds = [];
+        const n = this.paper.view.element.getBoundingClientRect(), i = new si.Rectangle(n.left, n.top, n.width, n.height);
+        if (this.container.nextElementSibling && this.container.nextElementSibling.querySelector("img")) {
+            const t = this.container.nextElementSibling.querySelector("img").getBoundingClientRect(), e = new si.Rectangle(t.left, t.top, t.width, t.height), n = Math.max(e.left, i.left), r = Math.max(e.top, i.top), s = Math.min(e.right, i.right), a = Math.min(e.bottom, i.bottom);
+            n < s && r < a && this.bounds.push({ left: n, right: s, top: 0, bottom: a - r })
+        } this.config.lines.splitDistance = Math.round(.01 * this.windowWidth), this.config.lines.line.width = Math.round(.05 * this.windowWidth), this.config.lines.line.move.max = Math.round(.09 * this.windowWidth), "s" === this.type && (this.isMobile ? (this.config.lines.splitDistance *= 6, this.config.lines.line.width *= 7) : (this.config.lines.splitDistance *= 4, this.config.lines.line.width *= 4)), this.buildLines()
+    } buildLines() {
+        const t = this.config.lines.splitDistance;
+        for (let t = 0;
+            t < this.lines.length;
+        ) { this.lines.pop().cleanUp() } for (let e of this.workPaths) {
+            const n = Math.round(e.length / t), i = Math.round(e.length / n);
+            for (let t = 0;
+                t < n;
+                t++) {
+                    const n = e.getLocationAt(i * t);
+                this.lines.push(new ai(n.point, n.normal, this.config.lines.line))
+            } const r = e.getLocationAt(e.length);
+            r && this.lines.push(new ai(r.point, r.normal, this.config.lines.line))
+        }
+    } extractPaths(t, e = []) {
+        let n = new Array(...e);
+        if (t.children) for (let e of t.children) "Path" == e.className ? n.push(e) : n = [...n, ...this.extractPaths(e)];
+        else { "Shape" != t.className && console.error(`Not supported ${t.className}`) } return n
+    } scroll(t) {
+        let e = this.scrollPos - window.scrollY;
+        this.mouse.mouseStrength *= .75, this.scrollPos = window.scrollY, this.updateMouseVel(this.mouse.pos.x, this.mouse.pos.y + .5 * e), this.paper.view.element.style.transform = `translateY(${.15 * window.scrollY}px)`
+    } mouseMove(t) { this.updateMouseVel(t.clientX, t.clientY) } updateMouseVel(t, e) {
+        const n = this.mouse.pos.x, i = this.mouse.pos.y;
+        if (this.mouse.pos.set(t, e), -1 == n || -1 == i) return;
+        if (n - t == 0 && i - e == 0) return;
+        let r = new ii(n - t, i - e), s = r.length();
+        r.normalize(), this.mouse.vel.mix(r, .15), s /= this.maxMov, this.mouse.strength += s, this.mouse.strength = Math.min(1, this.mouse.strength)
+    } updateVel() {
+        this.mouse.strength *= this.config.mouse.velDecay;
+        let t = this.mouse.vel.copy();
+        t.normalize(), this.mouse.vel.mix(t, .05), this.mouse.mouseStrength += .05 * (1 - this.mouse.mouseStrength)
+    } draw() {
+        if (this.images.forEach((t => t.update())), this.updateVel(), this.areLinesInView && this.lines) for (let t of this.lines) {
+            let e = 1;
+            for (let n of this.bounds) if (new ii(t.positionV2.x, t.positionV2.y + .15 * this.scrollPos).withinBounds(n)) {
+                e = .1;
+                break
+            } t.update(this.mouse.vel, this.mouse.pos, this.mouse.strength * e, this.mouse.mouseStrength)
+        }
+    } destroy() { console.log("destroy effects"), document.removeEventListener("mousemove", this.mouseMove.bind(this)), window.removeEventListener("scroll", this.scroll.bind(this)), this.observer && this.observer.disconnect(), this.images.forEach((t => t.destroy())), this.images = [] }
+};
