@@ -76,6 +76,8 @@ function drawContour(cmds) {
     cmd = cmds[i];
     switch (cmd.type) {
       case 'M':
+        vertex(cmd.x, cmd.y);
+        break;
       case 'Z':
         break;
       case 'L':
@@ -93,6 +95,8 @@ function drawContour(cmds) {
 }
 
 function preload() {
+  // canvas regular fails because of its square + linear shape
+  // fontData = loadBytes('fonts/Canvas-Regular.ttf');
   fontData = loadBytes('fonts/Peshka.ttf');
 }
 

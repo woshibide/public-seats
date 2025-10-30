@@ -11,14 +11,14 @@ let allColumnsPoints = [];
 
 // Menu-related variables
 let sliderValues = {
-  numRows:            { min: 2, value: 5, max: 10 },
-  numCols:            { min: 2, value: 4, max: 10 },
-  rowWidth:           { min: 2, value: 88, max: 2000 },
-  colWidth:           { min: 2, value: 44, max: 2000 },
+  numRows:            { min: 2, value: 5, max: 100 },
+  numCols:            { min: 2, value: 4, max: 100 },
+  rowWidth:           { min: 2, value: 88, max: 1000 },
+  colWidth:           { min: 2, value: 44, max: 1000 },
   randomOffset:       { min: 0, value: 8, max: 500 },
-  interpolationSteps: { min: 1, value: 8, max: 200 },
-  animationSpeed:     { min: 1, value: 300, max: 1000 },
-  maxShapes:          { min: 1, value: 4, max: 50 },
+  interpolationSteps: { min: 1, value: 8, max: 100 },
+  animationSpeed:     { min: 30, value: 300, max: 500 },
+  maxShapes:          { min: 1, value: 1, max: 50 },
   strokeWeight:       { min: 0, value: 0, max: 100 },
   bgColor:            { value: '#ffffff' },
   strokeColor:        { value: '#000000' },
@@ -26,9 +26,11 @@ let sliderValues = {
 };
 let flags = {
   shadows: false,
-  mode: false
+  mode: false,
+  randomMode: true
 };
 let isAnimating = false;
+let sketchNum = 0;
 
 const presetManager = new PresetManager();
 
@@ -42,6 +44,63 @@ let nextPoints = [];
 function easeInOutQuad(t) {
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
+
+// generate random values for all sliders within their ranges
+function generateRandomValues() {
+
+    let randomValues = {};
+    for (let prop in sliderValues) {
+        if (sliderValues[prop].min !== undefined && sliderValues[prop].max !== undefined) {
+            // for numeric sliders, generate random value within range
+            let range = sliderValues[prop].max - sliderValues[prop].min;
+            randomValues[prop] = Math.floor(Math.random() * range) + sliderValues[prop].min;
+        }
+    }
+
+    randomValues.strokeWeight = 0;
+
+    return randomValues;
+}
+
+// log current parameters to console
+function logCurrentParameters() {
+
+    
+    for (let prop in sliderValues) {
+        if (sliderValues[prop].min !== undefined) {
+            console.log(`${prop}: ${sliderValues[prop].value}`);
+        } else {
+            console.log(`${prop}: ${sliderValues[prop].value}`);
+        }
+    }
+}
+
+// apply random values to sliders
+function applyRandomValues() {
+    let randomValues = generateRandomValues();
+    sketchNum ++;
+    
+    console.log('=== ' + sketchNum + ' ===');
+   console.log(new Date().toISOString()); 
+
+    for (let prop in randomValues) {
+        sliderValues[prop].value = randomValues[prop];
+        console.log(`${prop}: ${randomValues[prop]}`);
+        
+        // update dom elements
+        let slider = document.getElementById(prop + 'Slider');
+        let valueSpan = document.getElementById(prop + 'Value');
+        if (slider) slider.value = randomValues[prop];
+        if (valueSpan) valueSpan.textContent = randomValues[prop];
+    }
+
+    console.log('=========================');
+    
+    // regenerate grid points with new values
+    currentPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 1), currentShape);
+    nextPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 2), currentShape + 1);
+}
+
 
 function generateGridPoints(numRows, numCols, rowWidth, colWidth, randomOffset, seed) {
     randomSeed(seed);
@@ -164,6 +223,10 @@ function draw() {
         currentShape++;
         if (currentShape >= sliderValues.maxShapes.value) {
             currentShape = 0;
+            // apply random values when loop completes in random mode
+            if (flags.randomMode) {
+                applyRandomValues();
+            }
         }
         currentPoints = nextPoints.map(col => col.map(v => v.copy()));
         nextPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 2), currentShape + 1);

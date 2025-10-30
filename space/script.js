@@ -1,125 +1,146 @@
-let newStar;
-let starArray = [];
+let newTchk;
+let tochkaArray = [];
 let h2, w2, d2; 
-let maxStars = 5000;
-let newStarsPerFrame = 50;
-let speedMin = 0.05;
-let speedMax = 0.5;
-let sizeIncrMax  = 3;
-let ageThreshold = 20;
-let noiseScale = 0.01;
-let movementSensitivity = 0.005;
+let maxTchks = 5000; 
+let newTchksPerFrame = 150;
+let speedMin = 0.02;
+let speedMax = 20;
+let sizeIncrMax =  30;
+let ageThreshold = 200;
+let noiseScale = 0.1;
+let movementSensitivity = 0.05;
 let paused = false;
+let sliderX, sliderY;
 let fadeMax = 255;
-let fadeMin = -10; 
+let fadeMin = -10;
+let zoom = 1;
 
-let currentAnima = 0;
-let animaState = [
-  {
-    x: 120,
-    y: 20
-  },
-  {
-    x: 10,
-    y: -5000
-  },
-  {
-    x: 100,
-    y: 5000
-  }
-];
+let font;
+let msg = "I N T E R N S";
+let leText = [];
+let ptSize = 36;
 
-// let sliderX = 10;
-// let sliderY = 200;
+///////////////////////////////
 
-function calculateCanvasSize() {
-  // 4/5 for insta posts or 1.91:1
-  let aspectRatio = 16 / 9; // width / height for Instagram story
-  let canvasWidth, canvasHeight;
-  if (windowWidth / windowHeight > aspectRatio) {
-    canvasHeight = windowHeight;
-    canvasWidth = canvasHeight * aspectRatio;
-  } else {
-    canvasWidth = windowWidth;
-    canvasHeight = canvasWidth / aspectRatio;
-  }
-  return { canvasWidth, canvasHeight };
+function preload(){
+  font = loadFont('./font/Peshka.ttf');
 }
 
 function setup() {
-  let { canvasWidth, canvasHeight } = calculateCanvasSize();
-  createCanvas(canvasWidth, canvasHeight);
+
+  createCanvas(542, 1080);
+  noStroke();
+  background(0);
+
+  textFont(font, 48);
+  textAlign(CENTER, CENTER);
+  
+  newTchk = new Tchk();
   w2 = width / 2;
   h2 = height / 2;
   d2 = dist(0, 0, w2, h2);
-  noStroke();
-  newStar = new Star();
-  background(0);
+  
+  sliderX = 280;
+  sliderY = 800;
+  document.getElementById('xSlider').max = width;
+  document.getElementById('xSlider').value = sliderX;
+  document.getElementById('ySlider').max = height;
+  document.getElementById('ySlider').value = sliderY;
+  updateSliderValue('x', sliderX);
+  updateSliderValue('y', sliderY);
 
-  frameRate(25);
-  textSize(24);
-  textAlign(CENTER, LEFT);
+  textSize(ptSize);
+
+  // load string msg to char
+  for(let i = 0; i < msg.length; i++){
+    leText.push(msg[i]);
+  }
+
 }
 
 function draw() {
 
   if (!paused) {
-
-    if (frameCount % 75 == 0) {
-      currentAnima = (currentAnima + 1) % animaState.length;
-    }
-    sliderX = animaState[currentAnima].x;
-    sliderY = animaState[currentAnima].y;
-
-    fill(0, map(dist(sliderX, sliderY, w2, h2), 0, d2, fadeMax, fadeMin));
+    
+    // bg, responsible for trail
+    fill(0, map(dist(fadeMin, fadeMax, w2, h2), 0, d2, fadeMax, fadeMin));
     rect(0, 0, width, height);
-    fill(255);
-    newStar.render();
 
+    
     push();
-    fill(255, 0, 0);
-    text(currentAnima, 20, 40);
+    translate(w2, h2);
+    scale(zoom);
+    translate(-w2, -h2);
+
+    // tochki
+    fill(255);
+    newTchk.render();
+
+    // saturated bg for text
+    push();
+    noFill();
+    
+    foo = 80
+    let bbrx, bbry;
+    
+    strokeWeight(2);
+    
+    for (let i = 0; i < newTchksPerFrame; i++) {
+      bbrx = random(foo, width-foo);
+      bbry = random(height/2 - foo/4, height/2 + foo/4);
+      stroke(255);
+      strokeWeight(2);
+      point(bbrx, bbry)
+    }
     pop();
 
-
-    // Add new stars
-    for (let i = 0; i < newStarsPerFrame; i++) {
-      starArray.push(new Star());
+    // new tochki
+    for (let i = 0; i < newTchksPerFrame; i++) {
+      tochkaArray.push(new Tchk());
     }
 
-    // Update and render stars, remove if out of bounds
-    for (let i = starArray.length - 1; i >= 0; i--) {
-      let star = starArray[i];
-      if (star.x < 0 || star.x > width || star.y < 0 || star.y > height) {
-        starArray.splice(i, 1);
+    // update and render tochki, remove if out of bounds
+    for (let i = tochkaArray.length - 1; i >= 0; i--) {
+      let tochka = tochkaArray[i];
+      if (tochka.x < 0 || tochka.x > width || tochka.y < 0 || tochka.y > height) {
+        tochkaArray.splice(i, 1);
       } else {
-        star.move();
-        star.render();
+        tochka.move();
+        tochka.render();
       }
     }
 
-    // Limit the number of stars
-    if (starArray.length > maxStars) {
-      starArray.splice(0, newStarsPerFrame);
+    // limit number of tochki
+    if (tochkaArray.length > maxTchks) {
+      tochkaArray.splice(0, newTchksPerFrame);
     }
+  
+    
+    push();
+    fill(0);
+    
+    text(msg, width / 2, height/2 - 5)
+    // for(let i = 0; i < msg.length; i ++){
+    //   text(leText[i], width / 2, (i * ptSize * 0.85) + 280)
+    // }
+
+    pop();
+
+    pop();
+
+    // paused = true;
   }
 }
 
-function windowResized() {
-  let { canvasWidth, canvasHeight } = calculateCanvasSize();
-  resizeCanvas(canvasWidth, canvasHeight);
-  w2 = width / 2;
-  h2 = height / 2;
-  d2 = dist(0, 0, w2, h2);
-}
+///////////////////////////////
 
-class Star {
+class Tchk {
   constructor() {
     this.x = random(width);
     this.y = random(height);
     this.speed = random(speedMin, speedMax);
     this.grow = int(random(0, 2));
-    this.d = this.grow === 1 ? 0 : random(0.2, 3);
+    this.d = this.grow === 1 ? 0 : random(0.2, sizeIncrMax);
     this.age = 0;
     this.sizeIncr = random(0, sizeIncrMax);
   }
@@ -146,25 +167,56 @@ class Star {
   }
 
   move() {
-    //                   can be mouse or just width for centered composition
-    this.x = this.x - map(sliderX, 0, width, -movementSensitivity * this.speed, movementSensitivity * this.speed) * (w2 - this.x);
-    this.y = this.y - map(sliderY, 0, height, -movementSensitivity * this.speed, movementSensitivity * this.speed) * (h2 - this.y);
+                                   // can be mouse or just width for centered composition
+    this.x = this.x + map(sliderX, 0, width, -movementSensitivity * this.speed, movementSensitivity * this.speed) * (w2 - this.x);
+    this.y = this.y + map(sliderY, 0, height, -movementSensitivity * this.speed, movementSensitivity * this.speed) * (h2 - this.y);
   }
 }
+
+//////////////////////////////////
+
+// function keyPressed(){
+//   if (key = " "){
+//     console.log(3)
+//     scale(5);
+//   }
+// }
+
+function mouseWheel(event) {
+  if (event.delta < 0){
+    zoom *= 1.1;
+  } else {
+    zoom /= 1.1;
+  }
+  
+}
+
+//////////////////////////////////
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  w2 = width / 2;
+  h2 = height / 2;
+  d2 = dist(0, 0, w2, h2);
+  sliderX = width / 2;
+  sliderY = height / 2;
+  document.getElementById('xSlider').max = width;
+  document.getElementById('xSlider').value = sliderX;
+  document.getElementById('ySlider').max = height;
+  document.getElementById('ySlider').value = sliderY;
+  updateSliderValue('x', sliderX);
+  updateSliderValue('y', sliderY);
+}
+
+
 
 function togglePause() {
   paused = !paused;
 }
 
-function keyPressed(){
-  if (key == " "){
-    togglePause();
-  }
-}
-
 function remakeAnimation() {
-  starArray = [];
-  newStar = new Star();
+  tochkaArray = [];
+  newTchk = new Tchk();
   background(0);
 }
 
@@ -172,12 +224,12 @@ function exportFrame() {
   saveCanvas('frame', 'png');
 }
 
-function updateMaxStars(value) {
-  maxStars = parseInt(value);
+function updateMaxTchks(value) {
+  maxTchks = parseInt(value);
 }
 
-function updateNewStarsPerFrame(value) {
-  newStarsPerFrame = parseInt(value);
+function updateNewTchksPerFrame(value) {
+  newTchksPerFrame = parseInt(value);
 }
 
 function updateSpeedMin(value) {
@@ -204,13 +256,13 @@ function updateMovementSensitivity(value) {
   movementSensitivity = parseFloat(value);
 }
 
-// function updateX(value) {
-//   sliderX = parseInt(value);
-// }
+function updateX(value) {
+  sliderX = parseInt(value);
+}
 
-// function updateY(value) {
-//   sliderY = parseInt(value);
-// }
+function updateY(value) {
+  sliderY = parseInt(value);
+}
 
 function updateFadeMax(value) {
   fadeMax = parseInt(value);
@@ -221,7 +273,7 @@ function updateFadeMin(value) {
 }
 
 function updateSliderValue(id, value) {
-  // document.getElementById(id + 'Value').textContent = value;
+  document.getElementById(id + 'Value').textContent = value;
 }
 
 function toggleMenu() {
