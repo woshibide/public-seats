@@ -1,5 +1,138 @@
 /*
 
+[Log] === 13 === (script.js, line 204)
+[Log] 2025-11-06T13:39:15.464Z (script.js, line 205)
+[Log] numRows: 27 (script.js, line 209)
+[Log] numCols: 3 (script.js, line 209)
+[Log] rowWidth: 12 (script.js, line 209)
+[Log] colWidth: 87 (script.js, line 209)
+[Log] randomOffset: 18 (script.js, line 209)
+[Log] interpolationSteps: 1 (script.js, line 209)
+[Log] animationSpeed: 100 (script.js, line 209)
+[Log] maxShapes: 28 (script.js, line 209)
+[Log] strokeWeight: 0 (script.js, line 209)
+
+[Log] === 3 === (script.js, line 192)
+[Log] 2025-11-06T13:35:59.164Z (script.js, line 193)
+[Log] numRows: 2 (script.js, line 197)
+[Log] numCols: 3 (script.js, line 197)
+[Log] rowWidth: 82 (script.js, line 197)
+[Log] colWidth: 56 (script.js, line 197)
+[Log] randomOffset: 90 (script.js, line 197)
+[Log] interpolationSteps: 15 (script.js, line 197)
+[Log] animationSpeed: 100 (script.js, line 197)
+[Log] maxShapes: 17 (script.js, line 197)
+[Log] strokeWeight: 0 (script.js, line 197)
+
+just the two of us
+[Log] === 14 === (script.js, line 178)
+[Log] 2025-11-06T13:35:31.206Z (script.js, line 179)
+[Log] numRows: 3 (script.js, line 183)
+[Log] numCols: 3 (script.js, line 183)
+[Log] rowWidth: 96 (script.js, line 183)
+[Log] colWidth: 30 (script.js, line 183)
+[Log] randomOffset: 70 (script.js, line 183)
+[Log] interpolationSteps: 1 (script.js, line 183)
+[Log] animationSpeed: 100 (script.js, line 183)
+[Log] maxShapes: 9 (script.js, line 183)
+[Log] strokeWeight: 0 (script.js, line 183)
+
+[Log] === 21 === (script.js, line 166)
+[Log] 2025-11-06T13:34:47.577Z (script.js, line 167)
+[Log] numRows: 28 (script.js, line 171)
+[Log] numCols: 8 (script.js, line 171)
+[Log] rowWidth: 27 (script.js, line 171)
+[Log] colWidth: 97 (script.js, line 171)
+[Log] randomOffset: 75 (script.js, line 171)
+[Log] interpolationSteps: 5 (script.js, line 171)
+[Log] animationSpeed: 100 (script.js, line 171)
+[Log] maxShapes: 3 (script.js, line 171)
+[Log] strokeWeight: 0 (script.js, line 171)
+
+=== 84 === (script.js, line 83)
+numRows: 21 (script.js, line 88)
+numCols: 28 (script.js, line 88)
+rowWidth: 53 (script.js, line 88)
+colWidth: 54 (script.js, line 88)
+randomOffset: 1 (script.js, line 88)
+interpolationSteps: 4 (script.js, line 88)
+animationSpeed: 100 (script.js, line 88)
+maxShapes: 12 (script.js, line 88)
+
+=== 2 === (script.js, line 99)
+numRows: 16 (script.js, line 104)
+numCols: 29 (script.js, line 104)
+rowWidth: 28 (script.js, line 104)
+colWidth: 85 (script.js, line 104)
+randomOffset: 72 (script.js, line 104)
+interpolationSteps: 19 (script.js, line 104)
+animationSpeed: 100 (script.js, line 104)
+maxShapes: 13 (script.js, line 104)
+
+ === 3 === (script.js, line 99)
+numRows: 20 script.js:88:17
+numCols: 3 script.js:88:17
+rowWidth: 91 script.js:88:17
+colWidth: 15 script.js:88:17
+randomOffset: 93 script.js:88:17
+interpolationSteps: 2 script.js:88:17
+animationSpeed: 100 script.js:88:17
+maxShapes: 6 script.js:88:17
+strokeWeight: 0
+
+=== 20 === script.js:119:13
+2025-11-06T13:21:01.224Z script.js:120:12
+numRows: 23 script.js:124:17
+numCols: 12 script.js:124:17
+rowWidth: 95 script.js:124:17
+colWidth: 96 script.js:124:17
+randomOffset: 85 script.js:124:17
+interpolationSteps: 1 script.js:124:17
+animationSpeed: 100 script.js:124:17
+maxShapes: 9 script.js:124:17
+strokeWeight: 0
+
+=== 19 === script.js:119:13
+2025-11-06T13:20:38.303Z script.js:120:12
+numRows: 4 script.js:124:17
+numCols: 6 script.js:124:17
+rowWidth: 2 script.js:124:17
+colWidth: 25 script.js:124:17
+randomOffset: 32 script.js:124:17
+interpolationSteps: 10 script.js:124:17
+animationSpeed: 100 script.js:124:17
+maxShapes: 20 script.js:124:17
+strokeWeight: 0
+
+=== 25 === script.js:119:13
+2025-11-06T13:22:45.830Z script.js:120:12
+numRows: 15 script.js:124:17
+numCols: 24 script.js:124:17
+rowWidth: 91 script.js:124:17
+colWidth: 11 script.js:124:17
+randomOffset: 2 script.js:124:17
+interpolationSteps: 14 script.js:124:17
+animationSpeed: 100 script.js:124:17
+maxShapes: 19 script.js:124:17
+strokeWeight: 0
+
+2025-11-06T13:27:43.740Z script.js:120:12
+numRows: 16 script.js:124:17
+numCols: 4 script.js:124:17
+rowWidth: 55 script.js:124:17
+colWidth: 68 script.js:124:17
+randomOffset: 22 script.js:124:17
+interpolationSteps: 3 script.js:124:17
+animationSpeed: 100 script.js:124:17
+maxShapes: 6 script.js:124:17
+strokeWeight: 0 script.js:124:17
+
+*/
+
+
+
+/*
+
 - stroke
 + svg
 + video
@@ -11,14 +144,14 @@ let allColumnsPoints = [];
 
 // Menu-related variables
 let sliderValues = {
-  numRows:            { min: 2, value: 5, max: 100 },
-  numCols:            { min: 2, value: 4, max: 100 },
-  rowWidth:           { min: 2, value: 88, max: 1000 },
-  colWidth:           { min: 2, value: 44, max: 1000 },
-  randomOffset:       { min: 0, value: 8, max: 500 },
-  interpolationSteps: { min: 1, value: 8, max: 100 },
-  animationSpeed:     { min: 30, value: 300, max: 500 },
-  maxShapes:          { min: 1, value: 1, max: 50 },
+  numRows:            { min: 2, value: 2, max: 30 },
+  numCols:            { min: 3, value: 3, max: 30 },
+  rowWidth:           { min: 2, value: 82, max: 100 },
+  colWidth:           { min: 2, value: 56, max: 100 },
+  randomOffset:       { min: 0, value: 90, max: 100 },
+  interpolationSteps: { min: 1, value: 15, max: 20 },
+  animationSpeed:     { min: 30, value: 100, max: 500 },
+  maxShapes:          { min: 1, value: 20, max: 30 },
   strokeWeight:       { min: 0, value: 0, max: 100 },
   bgColor:            { value: '#ffffff' },
   strokeColor:        { value: '#000000' },
@@ -36,13 +169,12 @@ const presetManager = new PresetManager();
 
 // Animation variables
 let currentShape = 0;
-// maxShapes and framesPerTransition are now controlled by sliders
 let transitionProgress = 0;
 let currentPoints = [];
 let nextPoints = [];
 
 function easeInOutQuad(t) {
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
 }
 
 // generate random values for all sliders within their ranges
@@ -58,6 +190,7 @@ function generateRandomValues() {
     }
 
     randomValues.strokeWeight = 0;
+    randomValues.animationSpeed = 100;
 
     return randomValues;
 }
@@ -188,6 +321,8 @@ function drawScene(g = window) {
     g.pop();
 }
 
+//////////////////////////////////
+
 function preload() {
     // img = loadImage('chair.jpg');
 }
@@ -195,7 +330,7 @@ function preload() {
 function setup() {
 
     strokeCap(SQUARE);
-	createCanvas(windowWidth, windowHeight);
+	createCanvas(windowWidth, windowHeight, SVG);
     // Generate initial points
     currentPoints = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 1), currentShape);
     nextPoints    = generateGridPoints(sliderValues.numRows.value, sliderValues.numCols.value, sliderValues.rowWidth.value, sliderValues.colWidth.value, sliderValues.randomOffset.value * (currentShape + 2), currentShape + 1);
@@ -223,7 +358,7 @@ function draw() {
         currentShape++;
         if (currentShape >= sliderValues.maxShapes.value) {
             currentShape = 0;
-            // apply random values when loop completes in random mode
+            
             if (flags.randomMode) {
                 applyRandomValues();
             }
@@ -235,6 +370,20 @@ function draw() {
 
 
 //////////////////////////////////
+
+
+function keyPressed(){
+    if(key == "s"){
+        exportGraphics();
+    }
+    if(key == "f"){
+        exportFrame();
+    }
+    if(key == "r"){
+        applyRandomValues();
+    }
+}
+
 
 // Initialize slider DOM elements to match sliderValues
 function initializeSliders() {
@@ -350,11 +499,6 @@ function updateText(value) {
     makeStrips();
 }
 
-// refresh sketch function
-function refreshSketch() {
-    redraw();
-}
-
 // toggle flag function
 function toggleFlag(flag) {
     flags[flag] = !flags[flag];
@@ -376,14 +520,11 @@ function toggleAnimation() {
 }
 
 function exportFrame() {
-    saveCanvas('animation_frame', 'svg');
+    saveCanvas('iba ', 'png');
 }
 
 function exportGraphics() {
-    let g = createGraphics(width, height);
-    g.clear(); // Set to transparent
-    drawScene(g);
-    g.save('graphics_no_bg.svg');
+    save('iba ', 'svg');
 }
 
 // Preset functions
